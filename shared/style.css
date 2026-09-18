@@ -223,6 +223,7 @@ footer.appfoot{ text-align:center; padding:18px; font-size:.72rem; color:var(--g
 .result-row .amount.positive{ color:var(--green); }
 .result-total{ display:flex; justify-content:space-between; align-items:baseline; margin-top:16px; padding-top:16px; border-top:1px solid rgba(214,243,255,.22); gap:16px; }
 .result-total .amount{ font-family:'Fira Sans Black'; font-size:1.5rem; color:var(--green); white-space:nowrap; }
+.result-total .amount.negative{ color:var(--red); }
 .result-total.grand{ margin-top:20px; padding:16px 18px; background:rgba(0,132,71,.1); border:1px solid rgba(0,132,71,.4); border-radius:var(--r-md); }
 .result-total.grand span:first-child{ font-family:'Inter SemiBold'; }
 .result-total.grand .amount{ font-size:1.7rem; }

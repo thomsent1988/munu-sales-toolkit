@@ -48,6 +48,7 @@
       <div class="split split-rev">
         <div class="box">
           <div class="box-title" data-i18n="bfyTransOmsetning"></div>
+          <div class="field"><label data-i18n="bfyTransOmsetning"></label><div class="field-input"><input type="number" id="t_omsetning" value="20020000"><span class="unit">kr</span></div></div>
           <div class="field"><label data-i18n="bfyTransAntall"></label><div class="field-input"><input type="number" id="t_antall" value="7000"></div></div>
           <div class="field"><label data-i18n="bfyTransKostPerTrans"></label><div class="field-input"><input type="number" id="t_kostPerTrans" value="2860"><span class="unit">kr</span></div></div>
 
@@ -255,21 +256,41 @@
     return '<div class="result-row"><span>'+t(labelKey)+'</span><span class="amount'+(cls?" "+cls:"")+'">'+fmt(value)+'</span></div>';
   }
 
+  function setAmount(el, value){
+    el.textContent = fmt(value);
+    el.classList.toggle("negative", value < 0);
+  }
+
   function updateGrandTotal(){
-    document.getElementById("grandTotal").textContent = fmt(window.MunuState.totalNet());
+    setAmount(document.getElementById("grandTotal"), window.MunuState.totalNet());
   }
 
   // ---------- transaction cost (always included) ----------
+  // Omsetning, antall transaksjoner and kostnad per transaksjon are kept in sync:
+  // editing antall or kostnad recalculates omsetning; editing omsetning recalculates kostnad.
+  var tOmsetning = document.getElementById("t_omsetning");
+  var tAntall = document.getElementById("t_antall");
+  var tKostPerTrans = document.getElementById("t_kostPerTrans");
+
+  function syncOmsetningFromAntallKost(){
+    var antall = num("t_antall"), kost = num("t_kostPerTrans");
+    tOmsetning.value = Math.round(antall * kost);
+  }
+  function syncKostFromOmsetning(){
+    var antall = num("t_antall"), oms = num("t_omsetning");
+    tKostPerTrans.value = antall > 0 ? +(oms / antall).toFixed(2) : 0;
+  }
+
   function renderTrans(){
     var antall = num("t_antall");
-    var omsetning = antall * num("t_kostPerTrans");
+    var omsetning = num("t_omsetning");
     var konkKost = omsetning * (num("t_konkProsent")/100) + antall * num("t_konkBehandling") + (num("t_konkLisens") + num("t_konkHw")) * 12;
     var munuKost = omsetning * (num("t_munuProsent")/100) + antall * num("t_munuBehandling") + (num("t_munuLisens") + num("t_munuHw")) * 12;
     var savings = konkKost - munuKost;
 
     document.getElementById("trans_rows").innerHTML =
-      row("bfyTransOmsetning", omsetning) + row("bfyResKonkKost", konkKost) + row("bfyResMunuKost", munuKost);
-    document.getElementById("trans_savings").textContent = fmt(savings);
+      row("bfyResKonkKost", konkKost) + row("bfyResMunuKost", munuKost);
+    setAmount(document.getElementById("trans_savings"), savings);
 
     window.MunuState.setCalculator("calc-trans", {
       label:{ no:"Transaksjonskostnad", en:"Transaction cost" },
@@ -278,7 +299,12 @@
     updateGrandTotal();
   }
 
+  tAntall.addEventListener("input", function(){ syncOmsetningFromAntallKost(); renderTrans(); });
+  tKostPerTrans.addEventListener("input", function(){ syncOmsetningFromAntallKost(); renderTrans(); });
+  tOmsetning.addEventListener("input", function(){ syncKostFromOmsetning(); renderTrans(); });
+
   document.querySelectorAll('.split.split-rev input').forEach(function(el){
+    if(el === tOmsetning || el === tAntall || el === tKostPerTrans) return;
     el.addEventListener("input", renderTrans);
   });
   document.querySelectorAll("#tierPresets .preset-btn").forEach(function(b){
@@ -309,7 +335,7 @@
     document.getElementById("regn_rows").innerHTML =
       row("bfyResRegnKost", regnKost) + row("bfyResStabKost", stabKost) +
       row("grwRegnModulkost", modulkostAr, "negative") + row("grwRegnSetup", setup, "negative");
-    document.getElementById("regn_net").textContent = fmt(net);
+    setAmount(document.getElementById("regn_net"), net);
     return { annualSavings:regnKost + stabKost, annualRevenueIncrease:0, annualNetResult:net };
   }
 
@@ -329,7 +355,7 @@
       row("grwResPerMnd", perMnd) + row("grwResPerAr", perAr) +
       '<div class="result-row"><span>'+t("grwResVekstProsent")+'</span><span class="amount">'+vekstProsent.toFixed(1)+' %</span></div>' +
       row("resModuleCost", modulkost * 12);
-    document.getElementById("mp_net").textContent = fmt(net);
+    setAmount(document.getElementById("mp_net"), net);
     return { annualSavings:0, annualRevenueIncrease:perAr, annualNetResult:net };
   }
 
@@ -340,7 +366,7 @@
     var net = revenueIncrease - modulkost * 12;
     document.getElementById("bk_rows").innerHTML =
       row("resRevenueIncrease", revenueIncrease) + row("resModuleCost", modulkost * 12);
-    document.getElementById("bk_net").textContent = fmt(net);
+    setAmount(document.getElementById("bk_net"), net);
     return { annualSavings:0, annualRevenueIncrease:revenueIncrease, annualNetResult:net };
   }
 
@@ -357,7 +383,7 @@
       row("grwWsDrift", driftAr) +
       '<div class="result-row"><span>'+t("grwWsTrans")+'</span><span class="amount negative">-'+fmt(transKostAr)+'</span></div>' +
       row("resModuleCost", modulkostAr);
-    document.getElementById("ws_net").textContent = fmt(net);
+    setAmount(document.getElementById("ws_net"), net);
     return { annualSavings:0, annualRevenueIncrease:revenueIncrease, annualNetResult:net };
   }
 
@@ -367,7 +393,7 @@
     var net = savings - modulkost * 12;
     document.getElementById("ki_rows").innerHTML =
       row("resSavings", savings) + row("resModuleCost", modulkost * 12);
-    document.getElementById("ki_net").textContent = fmt(net);
+    setAmount(document.getElementById("ki_net"), net);
     return { annualSavings:savings, annualRevenueIncrease:0, annualNetResult:net };
   }
 
@@ -381,7 +407,7 @@
       row("resRevenueIncrease", revenueIncrease) +
       '<div class="result-row"><span>'+t("grwQrBemanningskutt")+'</span><span class="amount">'+fmt(bemanningsgevinst)+'</span></div>' +
       row("resModuleCost", modulkost * 12);
-    document.getElementById("qr_net").textContent = fmt(net);
+    setAmount(document.getElementById("qr_net"), net);
     return { annualSavings:bemanningsgevinst, annualRevenueIncrease:revenueIncrease, annualNetResult:net };
   }
 
