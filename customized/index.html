@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Munu Customized</title>
+<link rel="stylesheet" href="../shared/style.css">
+</head>
+<body>
+<div id="app">
+  <main>
+    <div class="page">
+      <div class="page-hero">
+        <span class="eyebrow" data-i18n="custEyebrow"></span>
+        <h1 data-i18n-html="custTitleHtml"></h1>
+        <p data-i18n="custSub"></p>
+      </div>
+
+      <div class="choice-grid">
+        <a class="choice-card" href="best-for-you.html">
+          <svg class="card-icon" viewBox="0 0 48 48"><path d="M24 6 L40 14 V26 Q40 38 24 42 Q8 38 8 26 V14 Z"/><path d="M17 24 L22 29 L31 18"/></svg>
+          <h2 data-i18n="custBfyTitle"></h2>
+          <p data-i18n="custBfyDesc"></p>
+          <span class="card-cta"><span data-i18n="custBfyCta"></span><svg viewBox="0 0 24 24"><path d="M5 12 H19 M13 6 L19 12 L13 18"/></svg></span>
+        </a>
+
+        <a class="choice-card" href="growth.html">
+          <svg class="card-icon" viewBox="0 0 48 48"><path d="M8 34 L18 22 L26 28 L40 10"/><path d="M30 10 H40 V20"/></svg>
+          <h2 data-i18n="custGrowthTitle"></h2>
+          <p data-i18n="custGrowthDesc"></p>
+          <span class="card-cta"><span data-i18n="custGrowthCta"></span><svg viewBox="0 0 24 24"><path d="M5 12 H19 M13 6 L19 12 L13 18"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </main>
+  <footer class="appfoot">munu. &mdash; at your service</footer>
+</div>
+
+<script src="../shared/i18n.js"></script>
+<script src="../shared/header.js"></script>
+<script>
+  window.MunuHeader.inject({ logoSrc:"../logo/wordmark-light.png", homeHref:"../index.html", back:"../index.html" });
+</script>
+</body>
+</html>

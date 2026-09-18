@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Munu Sales Toolkit</title>
+<link rel="stylesheet" href="shared/style.css">
+</head>
+<body>
+<div id="app">
+  <main>
+    <div class="page">
+      <div class="page-hero">
+        <span class="eyebrow" data-i18n="idxEyebrow"></span>
+        <h1 data-i18n-html="idxTitleHtml"></h1>
+        <p data-i18n="idxSub"></p>
+      </div>
+
+      <div class="choice-grid">
+        <a class="choice-card" href="orbit/index.html">
+          <svg class="card-icon" viewBox="0 0 48 48"><circle cx="24" cy="24" r="8"/><circle cx="24" cy="24" r="19" stroke-dasharray="3 5"/><circle cx="24" cy="5" r="3"/><circle cx="41" cy="32" r="3"/><circle cx="7" cy="32" r="3"/></svg>
+          <h2 data-i18n="idxOrbitTitle"></h2>
+          <p data-i18n="idxOrbitDesc"></p>
+          <span class="card-cta"><span data-i18n="idxOrbitCta"></span><svg viewBox="0 0 24 24"><path d="M5 12 H19 M13 6 L19 12 L13 18"/></svg></span>
+        </a>
+
+        <a class="choice-card" href="customized/index.html">
+          <svg class="card-icon" viewBox="0 0 48 48"><line x1="8" y1="40" x2="40" y2="40"/><rect x="12" y="24" width="6" height="16"/><rect x="21" y="14" width="6" height="26"/><rect x="30" y="20" width="6" height="20"/></svg>
+          <h2 data-i18n="idxCustTitle"></h2>
+          <p data-i18n="idxCustDesc"></p>
+          <span class="card-cta"><span data-i18n="idxCustCta"></span><svg viewBox="0 0 24 24"><path d="M5 12 H19 M13 6 L19 12 L13 18"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </main>
+  <footer class="appfoot">munu. &mdash; at your service</footer>
+</div>
+
+<script src="shared/i18n.js"></script>
+<script src="shared/header.js"></script>
+<script>
+  window.MunuHeader.inject({ logoSrc:"logo/wordmark-light.png", homeHref:"index.html" });
+</script>
+</body>
+</html>
