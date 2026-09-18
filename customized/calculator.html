@@ -9,6 +9,9 @@
 <body>
 <svg style="position:absolute;width:0;height:0" aria-hidden="true">
 <defs>
+  <symbol id="icon-trans" viewBox="0 0 48 48">
+    <circle cx="14" cy="14" r="6"/><circle cx="34" cy="34" r="6"/><line x1="10" y1="38" x2="38" y2="10"/>
+  </symbol>
   <symbol id="icon-regnskap" viewBox="0 0 48 48">
     <rect x="10" y="8" width="20" height="32" rx="2"/>
     <line x1="14" y1="16" x2="26" y2="16"/><line x1="14" y1="22" x2="26" y2="22"/><line x1="14" y1="28" x2="22" y2="28"/>
@@ -45,43 +48,13 @@
         <p data-i18n="bfySub"></p>
       </div>
 
-      <div class="split split-rev">
-        <div class="box">
-          <div class="box-title" data-i18n="bfyTransOmsetning"></div>
-          <div class="field"><label data-i18n="bfyTransOmsetning"></label><div class="field-input"><input type="number" id="t_omsetning" value="20020000"><span class="unit">kr</span></div></div>
-          <div class="field"><label data-i18n="bfyTransAntall"></label><div class="field-input"><input type="number" id="t_antall" value="7000"></div></div>
-          <div class="field"><label data-i18n="bfyTransKostPerTrans"></label><div class="field-input"><input type="number" id="t_kostPerTrans" value="2860"><span class="unit">kr</span></div></div>
-
-          <div class="box-title" style="margin-top:20px" data-i18n="bfyTransKonkHead"></div>
-          <div class="field"><label data-i18n="bfyTransKonkProsent"></label><div class="field-input"><input type="number" step="0.01" id="t_konkProsent" value="1.75"><span class="unit">%</span></div></div>
-          <div class="field"><label data-i18n="fieldProcessingFee"></label><div class="field-input"><input type="number" step="0.01" id="t_konkBehandling" value="0"><span class="unit">kr</span></div></div>
-          <div class="field"><label data-i18n="bfyTransKonkLisens"></label><div class="field-input"><input type="number" id="t_konkLisens" value="275"><span class="unit">kr</span></div></div>
-          <div class="field"><label data-i18n="bfyTransKonkHw"></label><div class="field-input"><input type="number" id="t_konkHw" value="0"><span class="unit">kr</span></div></div>
-
-          <div class="box-title" style="margin-top:20px" data-i18n="bfyTransMunuHead"></div>
-          <div class="field"><label data-i18n="bfyTransMunuProsent"></label><div class="field-input"><input type="number" step="0.01" id="t_munuProsent" value="0.55"><span class="unit">%</span></div></div>
-          <div class="preset-row" id="tierPresets">
-            <button type="button" class="preset-btn active" data-value="0.55">IC++ 0.55%</button>
-            <button type="button" class="preset-btn" data-value="0.60">Tier 8 0.60%</button>
-            <button type="button" class="preset-btn" data-value="0.70">Tier 1 0.70%</button>
-          </div>
-          <div class="field"><label data-i18n="fieldProcessingFee"></label><div class="field-input"><input type="number" step="0.01" id="t_munuBehandling" value="0.40"><span class="unit">kr</span></div></div>
-          <div class="field"><label data-i18n="bfyTransMunuLisens"></label><div class="field-input"><input type="number" id="t_munuLisens" value="2005"><span class="unit">kr</span></div></div>
-          <div class="field"><label data-i18n="bfyTransMunuHw"></label><div class="field-input"><input type="number" id="t_munuHw" value="936"><span class="unit">kr</span></div></div>
-        </div>
-
-        <div class="sticky-col">
-          <div class="box">
-            <div class="box-title" data-i18n="bfyTransBoxTitle"></div>
-            <div id="trans_rows"></div>
-            <div class="result-total"><span data-i18n="bfyResSavings"></span><span class="amount" id="trans_savings"></span></div>
-            <div class="result-total grand"><span data-i18n="fpTitle"></span><span class="amount" id="grandTotal"></span></div>
-          </div>
-        </div>
-      </div>
-
-      <p class="box-title" style="text-align:center;margin:36px 0 14px" data-i18n="grwModuleHint"></p>
+      <p class="box-title" style="text-align:center;margin-bottom:14px" data-i18n="grwModuleHint"></p>
       <div class="module-grid" id="moduleGrid">
+        <label class="module-card" data-mod="trans">
+          <input type="checkbox" checked>
+          <svg class="module-icon"><use href="#icon-trans"/></svg>
+          <span class="module-name" data-i18n="grwModTrans"></span>
+        </label>
         <label class="module-card" data-mod="regnskap">
           <input type="checkbox">
           <svg class="module-icon"><use href="#icon-regnskap"/></svg>
@@ -114,7 +87,64 @@
         </label>
       </div>
 
+      <div class="box">
+        <div class="result-total grand" style="margin-top:0">
+          <span data-i18n="fpTitle"></span><span class="amount" id="grandTotal"></span>
+        </div>
+      </div>
+
       <div id="moduleDetails">
+        <div class="module-detail" id="detail-trans">
+          <div class="split">
+            <div class="box">
+              <div class="module-detail-head"><h3 data-i18n="grwModTrans"></h3></div>
+              <div class="field"><label data-i18n="bfyTransOmsetning"></label><div class="field-input"><input type="number" id="t_omsetning" value="20020000"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="bfyTransAntall"></label><div class="field-input"><input type="number" id="t_antall" value="7000"></div></div>
+
+              <div class="box-title" style="margin-top:20px" data-i18n="bfyTransKonkHead"></div>
+              <div class="field"><label data-i18n="bfyTransKonkProsent"></label><div class="field-input"><input type="number" step="0.01" id="t_konkProsent" value="1.75"><span class="unit">%</span></div></div>
+              <div class="field"><label data-i18n="fieldProcessingFee"></label><div class="field-input"><input type="number" step="0.01" id="t_konkBehandling" value="0"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="bfyTotalFixedCost"></label><div class="field-input"><input type="number" id="t_konkFixed" value="275"><span class="unit">kr</span></div></div>
+
+              <div class="box-title" style="margin-top:20px" data-i18n="bfyTransMunuHead"></div>
+              <div class="field"><label data-i18n="bfyTransMunuProsent"></label><div class="field-input"><input type="number" step="0.01" id="t_munuProsent" value="0.55"><span class="unit">%</span></div></div>
+              <div class="preset-row" id="tierPresets">
+                <button type="button" class="preset-btn active" data-value="0.55">IC++ 0.55%</button>
+                <button type="button" class="preset-btn" data-value="0.60">Tier 8 0.60%</button>
+                <button type="button" class="preset-btn" data-value="0.70">Tier 1 0.70%</button>
+              </div>
+              <div class="field"><label data-i18n="fieldProcessingFee"></label><div class="field-input"><input type="number" step="0.01" id="t_munuBehandling" value="0.40"><span class="unit">kr</span></div></div>
+
+              <div class="box-title" style="margin-top:20px" data-i18n="hwSectionHead"></div>
+
+              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwKasse"></label></div>
+              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_kasse_qty" value="1"></div></div>
+              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_kasse_price" value="1014"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_kasse_setup" value="2500"><span class="unit">kr</span></div></div>
+
+              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwPrinter"></label></div>
+              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_printer_qty" value="0"></div></div>
+              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_printer_price" value="148"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_printer_setup" value="0"><span class="unit">kr</span></div></div>
+
+              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwAdyenTerminal"></label></div>
+              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_adyenTerminal_qty" value="1"></div></div>
+              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_adyenTerminal_price" value="349"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_adyenTerminal_setup" value="750"><span class="unit">kr</span></div></div>
+
+              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwAdyenPos"></label></div>
+              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_adyenPos_qty" value="0"></div></div>
+              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_adyenPos_price" value="876"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_adyenPos_setup" value="750"><span class="unit">kr</span></div></div>
+            </div>
+            <div class="box">
+              <div class="box-title" data-i18n="bfyTransBoxTitle"></div>
+              <div id="trans_rows"></div>
+              <div class="result-total"><span data-i18n="bfyResSavings"></span><span class="amount" id="trans_savings"></span></div>
+            </div>
+          </div>
+        </div>
+
         <div class="module-detail" id="detail-regnskap" hidden>
           <div class="split">
             <div class="box">
@@ -153,7 +183,7 @@
                 <div class="range-minmax"><span>5 %</span><span>60 %</span></div>
               </div>
               <div class="field"><label data-i18n="grwMpGrowthCustom"></label><div class="field-input"><input type="number" id="mp_growthCustom" value="30"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwMpModulkost"></label><div class="field-input"><input type="number" id="mp_modulkost" value="0"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="grwMpModulkost"></label><div class="field-input"><input type="number" id="mp_modulkost" value="235"><span class="unit">kr</span></div></div>
             </div>
             <div class="box">
               <div class="box-title" data-i18n="grwResPerAr"></div>
@@ -171,7 +201,7 @@
               <div class="field"><label data-i18n="grwBkAntall"></label><div class="field-input"><input type="number" id="bk_antall" value="400"></div></div>
               <div class="field"><label data-i18n="grwBkNoShowFor"></label><div class="field-input"><input type="number" step="0.1" id="bk_noShowFor" value="12"><span class="unit">%</span></div></div>
               <div class="field"><label data-i18n="grwBkNoShowEtter"></label><div class="field-input"><input type="number" step="0.1" id="bk_noShowEtter" value="4"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwBkModulkost"></label><div class="field-input"><input type="number" id="bk_modulkost" value="0"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="grwBkModulkost"></label><div class="field-input"><input type="number" id="bk_modulkost" value="900"><span class="unit">kr</span></div></div>
             </div>
             <div class="box">
               <div class="box-title" data-i18n="resRevenueIncrease"></div>
@@ -189,7 +219,7 @@
               <div class="field"><label data-i18n="grwWsMargin"></label><div class="field-input"><input type="number" id="ws_margin" value="65"><span class="unit">%</span></div></div>
               <div class="field"><label data-i18n="grwWsDrift"></label><div class="field-input"><input type="number" id="ws_drift" value="2500"><span class="unit">kr</span></div></div>
               <div class="field"><label data-i18n="grwWsTrans"></label><div class="field-input"><input type="number" step="0.01" id="ws_trans" value="1.75"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwWsModulkost"></label><div class="field-input"><input type="number" id="ws_modulkost" value="0"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="grwWsModulkost"></label><div class="field-input"><input type="number" id="ws_modulkost" value="1385"><span class="unit">kr</span></div></div>
             </div>
             <div class="box">
               <div class="box-title" data-i18n="resRevenueIncrease"></div>
@@ -205,7 +235,7 @@
               <div class="module-detail-head"><h3 data-i18n="grwModKiosk"></h3></div>
               <div class="field"><label data-i18n="grwKiArsverk"></label><div class="field-input"><input type="number" step="0.1" id="ki_arsverk" value="1"></div></div>
               <div class="field"><label data-i18n="grwKiLonn"></label><div class="field-input"><input type="number" id="ki_lonn" value="420000"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwKiModulkost"></label><div class="field-input"><input type="number" id="ki_modulkost" value="0"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="grwKiModulkost"></label><div class="field-input"><input type="number" id="ki_modulkost" value="1499"><span class="unit">kr</span></div></div>
             </div>
             <div class="box">
               <div class="box-title" data-i18n="resSavings"></div>
@@ -224,7 +254,7 @@
               <div class="field"><label data-i18n="grwQrAntallOrdrer"></label><div class="field-input"><input type="number" id="qr_antallOrdrer" value="750"></div></div>
               <div class="field"><label data-i18n="grwQrBemanningskutt"></label><div class="field-input"><input type="number" step="0.1" id="qr_bemanning" value="0"></div></div>
               <div class="field"><label data-i18n="grwKiLonn"></label><div class="field-input"><input type="number" id="qr_lonn" value="420000"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwQrModulkost"></label><div class="field-input"><input type="number" id="qr_modulkost" value="0"><span class="unit">kr</span></div></div>
+              <div class="field"><label data-i18n="grwQrModulkost"></label><div class="field-input"><input type="number" id="qr_modulkost" value="1385"><span class="unit">kr</span></div></div>
             </div>
             <div class="box">
               <div class="box-title" data-i18n="resRevenueIncrease"></div>
@@ -255,6 +285,9 @@
   function row(labelKey, value, cls){
     return '<div class="result-row"><span>'+t(labelKey)+'</span><span class="amount'+(cls?" "+cls:"")+'">'+fmt(value)+'</span></div>';
   }
+  function infoRow(labelKey, text){
+    return '<div class="result-row"><span>'+t(labelKey)+'</span><span class="amount info">'+text+'</span></div>';
+  }
 
   function setAmount(el, value){
     el.textContent = fmt(value);
@@ -265,58 +298,8 @@
     setAmount(document.getElementById("grandTotal"), window.MunuState.totalNet());
   }
 
-  // ---------- transaction cost (always included) ----------
-  // Omsetning, antall transaksjoner and kostnad per transaksjon are kept in sync:
-  // editing antall or kostnad recalculates omsetning; editing omsetning recalculates kostnad.
-  var tOmsetning = document.getElementById("t_omsetning");
-  var tAntall = document.getElementById("t_antall");
-  var tKostPerTrans = document.getElementById("t_kostPerTrans");
-
-  function syncOmsetningFromAntallKost(){
-    var antall = num("t_antall"), kost = num("t_kostPerTrans");
-    tOmsetning.value = Math.round(antall * kost);
-  }
-  function syncKostFromOmsetning(){
-    var antall = num("t_antall"), oms = num("t_omsetning");
-    tKostPerTrans.value = antall > 0 ? +(oms / antall).toFixed(2) : 0;
-  }
-
-  function renderTrans(){
-    var antall = num("t_antall");
-    var omsetning = num("t_omsetning");
-    var konkKost = omsetning * (num("t_konkProsent")/100) + antall * num("t_konkBehandling") + (num("t_konkLisens") + num("t_konkHw")) * 12;
-    var munuKost = omsetning * (num("t_munuProsent")/100) + antall * num("t_munuBehandling") + (num("t_munuLisens") + num("t_munuHw")) * 12;
-    var savings = konkKost - munuKost;
-
-    document.getElementById("trans_rows").innerHTML =
-      row("bfyResKonkKost", konkKost) + row("bfyResMunuKost", munuKost);
-    setAmount(document.getElementById("trans_savings"), savings);
-
-    window.MunuState.setCalculator("calc-trans", {
-      label:{ no:"Transaksjonskostnad", en:"Transaction cost" },
-      annualSavings:savings, annualRevenueIncrease:0, annualNetResult:savings, includedInTotal:true
-    });
-    updateGrandTotal();
-  }
-
-  tAntall.addEventListener("input", function(){ syncOmsetningFromAntallKost(); renderTrans(); });
-  tKostPerTrans.addEventListener("input", function(){ syncOmsetningFromAntallKost(); renderTrans(); });
-  tOmsetning.addEventListener("input", function(){ syncKostFromOmsetning(); renderTrans(); });
-
-  document.querySelectorAll('.split.split-rev input').forEach(function(el){
-    if(el === tOmsetning || el === tAntall || el === tKostPerTrans) return;
-    el.addEventListener("input", renderTrans);
-  });
-  document.querySelectorAll("#tierPresets .preset-btn").forEach(function(b){
-    b.addEventListener("click", function(){
-      document.getElementById("t_munuProsent").value = b.dataset.value;
-      document.querySelectorAll("#tierPresets .preset-btn").forEach(function(x){ x.classList.toggle("active", x === b); });
-      renderTrans();
-    });
-  });
-
-  // ---------- growth / savings modules (toggle-able) ----------
   var LABELS = {
+    trans:{ no:"Transaksjonskostnad", en:"Transaction cost" },
     regnskap:{ no:"Regnskapsintegrasjon", en:"Accounting integration" },
     multipay:{ no:"Multipay", en:"Multipay" },
     booking:{ no:"Booking", en:"Booking" },
@@ -325,16 +308,74 @@
     qr:{ no:"Selvbetjent QR", en:"Self-service QR" }
   };
 
+  // ---------- transaction cost ----------
+  var HW_ITEMS = ["kasse", "printer", "adyenTerminal", "adyenPos"];
+
+  function hardwareTotals(){
+    var monthly = 0, setup = 0;
+    HW_ITEMS.forEach(function(key){
+      monthly += num("hw_" + key + "_qty") * num("hw_" + key + "_price");
+      setup += num("hw_" + key + "_qty") * num("hw_" + key + "_setup");
+    });
+    return { monthly:monthly, setup:setup };
+  }
+
+  function renderTrans(){
+    var antall = num("t_antall");
+    var omsetning = num("t_omsetning");
+    var konkFixed = num("t_konkFixed");
+    var konkKost = omsetning * (num("t_konkProsent")/100) + antall * num("t_konkBehandling") + konkFixed * 12;
+
+    var hw = hardwareTotals();
+    var munuFixed = hw.monthly;
+    var munuKost = omsetning * (num("t_munuProsent")/100) + antall * num("t_munuBehandling") + munuFixed * 12;
+    var setupTotal = hw.setup;
+    var savings = konkKost - munuKost - setupTotal;
+
+    var A = (num("t_konkProsent") - num("t_munuProsent")) / 100;
+    var B = antall * (num("t_munuBehandling") - num("t_konkBehandling")) + (munuFixed - konkFixed) * 12;
+    var breakevenText;
+    if(Math.abs(A) < 1e-9){
+      breakevenText = B <= 0 ? t("alwaysProfitable") : t("neverProfitable");
+    } else {
+      var be = B / A;
+      if(A > 0){
+        breakevenText = be <= 0 ? t("alwaysProfitable") : fmt(be);
+      } else {
+        breakevenText = be <= 0 ? t("neverProfitable") : fmt(be);
+      }
+    }
+
+    document.getElementById("trans_rows").innerHTML =
+      row("bfyTotalFixedCost", munuFixed) +
+      row("bfyResKonkKost", konkKost) + row("bfyResMunuKost", munuKost) +
+      (setupTotal > 0 ? row("bfySetupTotal", setupTotal, "negative") : "") +
+      infoRow("breakevenRevenue", breakevenText);
+    setAmount(document.getElementById("trans_savings"), savings);
+
+    return { annualSavings:savings, annualRevenueIncrease:0, annualNetResult:savings };
+  }
+
+  document.querySelectorAll("#tierPresets .preset-btn").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.getElementById("t_munuProsent").value = b.dataset.value;
+      document.querySelectorAll("#tierPresets .preset-btn").forEach(function(x){ x.classList.toggle("active", x === b); });
+      syncModule("trans");
+    });
+  });
+
   function renderRegnskap(){
     var freq = num("regn_frekvens");
     var regnKost = num("regn_pris") * (num("regn_min")/60) * freq;
     var stabKost = num("regn_stabPris") * (num("regn_stabMin")/60) * 52;
     var modulkostAr = num("regn_modulkost") * 12;
     var setup = num("regn_setup");
-    var net = regnKost + stabKost - modulkostAr - setup;
+    var totalCost = modulkostAr + setup;
+    var net = regnKost + stabKost - totalCost;
     document.getElementById("regn_rows").innerHTML =
       row("bfyResRegnKost", regnKost) + row("bfyResStabKost", stabKost) +
-      row("grwRegnModulkost", modulkostAr, "negative") + row("grwRegnSetup", setup, "negative");
+      row("grwRegnModulkost", modulkostAr, "negative") + row("grwRegnSetup", setup, "negative") +
+      row("breakevenSavings", totalCost, "info");
     setAmount(document.getElementById("regn_net"), net);
     return { annualSavings:regnKost + stabKost, annualRevenueIncrease:0, annualNetResult:net };
   }
@@ -349,12 +390,14 @@
     var perAr = perHelgedag * helgedager;
     var vekstProsent = (daily > 0 && helgedager > 0) ? (perAr / (daily * helgedager)) * 100 : 0;
     var modulkost = num("mp_modulkost");
-    var net = perAr - modulkost * 12;
+    var totalCost = modulkost * 12;
+    var net = perAr - totalCost;
     document.getElementById("mp_rows").innerHTML =
       row("grwResPerHelgedag", perHelgedag) + row("grwResPerHelg", perHelg) +
       row("grwResPerMnd", perMnd) + row("grwResPerAr", perAr) +
       '<div class="result-row"><span>'+t("grwResVekstProsent")+'</span><span class="amount">'+vekstProsent.toFixed(1)+' %</span></div>' +
-      row("resModuleCost", modulkost * 12);
+      row("resModuleCost", totalCost) +
+      row("breakevenRevenueYear", totalCost, "info");
     setAmount(document.getElementById("mp_net"), net);
     return { annualSavings:0, annualRevenueIncrease:perAr, annualNetResult:net };
   }
@@ -363,36 +406,47 @@
     var reddetMnd = num("bk_snittbord") * num("bk_antall") * ((num("bk_noShowFor") - num("bk_noShowEtter"))/100);
     var revenueIncrease = reddetMnd * 12;
     var modulkost = num("bk_modulkost");
-    var net = revenueIncrease - modulkost * 12;
+    var totalCost = modulkost * 12;
+    var net = revenueIncrease - totalCost;
     document.getElementById("bk_rows").innerHTML =
-      row("resRevenueIncrease", revenueIncrease) + row("resModuleCost", modulkost * 12);
+      row("resRevenueIncrease", revenueIncrease) + row("resModuleCost", totalCost) +
+      row("breakevenRevenueYear", totalCost, "info");
     setAmount(document.getElementById("bk_net"), net);
     return { annualSavings:0, annualRevenueIncrease:revenueIncrease, annualNetResult:net };
   }
 
   function renderWebshop(){
     var revenueIncrease = num("ws_ekstraOms") * 12;
-    var bruttoresultat = revenueIncrease * (num("ws_margin")/100);
+    var margin = num("ws_margin"), transPct = num("ws_trans");
+    var bruttoresultat = revenueIncrease * (margin/100);
     var driftAr = num("ws_drift") * 12;
-    var transKostAr = revenueIncrease * (num("ws_trans")/100);
+    var transKostAr = revenueIncrease * (transPct/100);
     var modulkostAr = num("ws_modulkost") * 12;
     var net = bruttoresultat - driftAr - transKostAr - modulkostAr;
+    var rate = (margin - transPct) / 100;
+    var totalFixed = driftAr + modulkostAr;
+    var breakevenText = rate <= 0 ? t("neverProfitable") : fmt((totalFixed / rate) / 12);
     document.getElementById("ws_rows").innerHTML =
       row("resRevenueIncrease", revenueIncrease) +
       '<div class="result-row"><span>'+t("grwWsMargin")+'</span><span class="amount">'+fmt(bruttoresultat)+'</span></div>' +
       row("grwWsDrift", driftAr) +
       '<div class="result-row"><span>'+t("grwWsTrans")+'</span><span class="amount negative">-'+fmt(transKostAr)+'</span></div>' +
-      row("resModuleCost", modulkostAr);
+      row("resModuleCost", modulkostAr) +
+      infoRow("breakevenRevenueMonth", breakevenText);
     setAmount(document.getElementById("ws_net"), net);
     return { annualSavings:0, annualRevenueIncrease:revenueIncrease, annualNetResult:net };
   }
 
   function renderKiosk(){
-    var savings = num("ki_arsverk") * num("ki_lonn");
+    var lonn = num("ki_lonn");
+    var savings = num("ki_arsverk") * lonn;
     var modulkost = num("ki_modulkost");
-    var net = savings - modulkost * 12;
+    var totalCost = modulkost * 12;
+    var net = savings - totalCost;
+    var breakevenFte = lonn > 0 ? (totalCost / lonn).toFixed(2) : "–";
     document.getElementById("ki_rows").innerHTML =
-      row("resSavings", savings) + row("resModuleCost", modulkost * 12);
+      row("resSavings", savings) + row("resModuleCost", totalCost) +
+      infoRow("breakevenFte", breakevenFte);
     setAmount(document.getElementById("ki_net"), net);
     return { annualSavings:savings, annualRevenueIncrease:0, annualNetResult:net };
   }
@@ -402,16 +456,20 @@
     var revenueIncrease = ekstraOmsMnd * 12;
     var bemanningsgevinst = num("qr_bemanning") * num("qr_lonn");
     var modulkost = num("qr_modulkost");
-    var net = revenueIncrease + bemanningsgevinst - modulkost * 12;
+    var totalCost = modulkost * 12;
+    var net = revenueIncrease + bemanningsgevinst - totalCost;
+    var breakevenNeeded = totalCost - bemanningsgevinst;
+    var breakevenText = breakevenNeeded <= 0 ? t("alwaysProfitable") : fmt(breakevenNeeded);
     document.getElementById("qr_rows").innerHTML =
       row("resRevenueIncrease", revenueIncrease) +
       '<div class="result-row"><span>'+t("grwQrBemanningskutt")+'</span><span class="amount">'+fmt(bemanningsgevinst)+'</span></div>' +
-      row("resModuleCost", modulkost * 12);
+      row("resModuleCost", totalCost) +
+      infoRow("breakevenRevenueYear", breakevenText);
     setAmount(document.getElementById("qr_net"), net);
     return { annualSavings:bemanningsgevinst, annualRevenueIncrease:revenueIncrease, annualNetResult:net };
   }
 
-  var RENDERERS = { regnskap:renderRegnskap, multipay:renderMultipay, booking:renderBooking, webshop:renderWebshop, kiosk:renderKiosk, qr:renderQr };
+  var RENDERERS = { trans:renderTrans, regnskap:renderRegnskap, multipay:renderMultipay, booking:renderBooking, webshop:renderWebshop, kiosk:renderKiosk, qr:renderQr };
   var MODS = Object.keys(RENDERERS);
 
   function syncModule(mod){
@@ -463,9 +521,8 @@
     syncModule("multipay");
   });
 
-  document.addEventListener("munu:langchange", function(){ renderTrans(); renderAllModules(); });
+  document.addEventListener("munu:langchange", renderAllModules);
 
-  renderTrans();
   renderAllModules();
 })();
 </script>
