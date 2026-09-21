@@ -38,7 +38,7 @@
       bfySetupNote:"Fri sum — dette er ofte der vi gir mest rabatt",
 
       hwSectionHead:"Munu maskinvare",
-      hwKasse:"Kasse", hwPrinter:"Printer", hwAdyenTerminal:"Adyen bankterminal", hwAdyenPos:"Adyen med POS",
+      hwKasse:"Kasse", hwAdyenTerminal:"Adyen bankterminal", hwAdyenPos:"Adyen med POS",
       hwQty:"Antall", hwPriceMonth:"Pris per måned",
 
       breakevenRevenue:"Breakeven omsetning",
@@ -120,7 +120,7 @@
       bfySetupNote:"Open figure — this is usually where we give the most discount",
 
       hwSectionHead:"Munu hardware",
-      hwKasse:"Till", hwPrinter:"Printer", hwAdyenTerminal:"Adyen card terminal", hwAdyenPos:"Adyen with POS",
+      hwKasse:"POS", hwAdyenTerminal:"Adyen card terminal", hwAdyenPos:"Adyen with POS",
       hwQty:"Quantity", hwPriceMonth:"Price per month",
 
       breakevenRevenue:"Breakeven revenue",
