@@ -35,7 +35,7 @@
       bfyResMunuKost:"Kostnad med Munu per år",
       bfyResSavings:"Besparelse per år",
       bfySetupTotal:"Engangskostnad oppsett",
-      bfySetupNote:"Fri sum — dette er ofte der vi gir mest rabatt",
+      bfySnittPris:"Snitt pris per transaksjon",
 
       hwSectionHead:"Munu maskinvare",
       hwKasse:"Kasse", hwAdyenTerminal:"Adyen bankterminal", hwAdyenPos:"Adyen med POS",
@@ -117,7 +117,7 @@
       bfyResMunuKost:"Cost with Munu per year",
       bfyResSavings:"Savings per year",
       bfySetupTotal:"One-time setup cost",
-      bfySetupNote:"Open figure — this is usually where we give the most discount",
+      bfySnittPris:"Average price per transaction",
 
       hwSectionHead:"Munu hardware",
       hwKasse:"POS", hwAdyenTerminal:"Adyen card terminal", hwAdyenPos:"Adyen with POS",
