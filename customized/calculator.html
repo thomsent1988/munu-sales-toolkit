@@ -5,6 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Find the leak</title>
 <link rel="stylesheet" href="../shared/style.css">
+<style>
+  .orbit-wrap{ position:relative; width:min(88vmin,540px); height:min(88vmin,540px); margin:44px auto 8px; }
+  .orbit-ring{ position:absolute; inset:8%; border:1px dashed rgba(214,243,255,.22); border-radius:50%; }
+  .hub{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    width:clamp(84px,15vmin,124px); height:clamp(84px,15vmin,124px); border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, rgba(214,243,255,.22), rgba(214,243,255,.03) 60%), rgba(214,243,255,.06);
+    border:1px solid rgba(214,243,255,.3); display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 60px rgba(214,243,255,.15); z-index:2;
+  }
+  .hub img{ width:58%; height:auto; }
+  .nodes{ position:absolute; inset:0; z-index:3; }
+  .node{
+    position:absolute; display:flex; flex-direction:column; align-items:center; gap:4px;
+    width:clamp(74px,17vmin,110px); padding:12px 6px 10px; text-align:center;
+    background:rgba(0,7,67,.6); border:1px solid rgba(214,243,255,.28); border-radius:var(--r-lg); color:var(--paper);
+    transition:border-color .25s var(--ease-snap), background .25s var(--ease-snap), transform .25s var(--ease-snap), box-shadow .25s var(--ease-snap);
+  }
+  .node:hover, .node:focus-visible{ border-color:var(--bloom); background:rgba(241,183,242,.12); transform:translateY(-4px); box-shadow:0 10px 30px rgba(241,183,242,.18); }
+  .node.included{ border-color:var(--green); }
+  .node-icon{ width:22px; height:22px; stroke:var(--mist); fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+  .node:hover .node-icon{ stroke:var(--bloom); }
+  .node-label{ font-family:'Inter SemiBold'; font-size:.76rem; }
+  .node-amount{ font-size:.66rem; color:var(--green); font-family:'Inter SemiBold'; min-height:.9em; }
+
+  #wipe{ position:fixed; inset:0; z-index:60; background:var(--mist); transform:translateX(-100%); pointer-events:none; }
+  @keyframes wipeSweep{ 0%{ transform:translateX(-100%); } 50%{ transform:translateX(0); } 100%{ transform:translateX(100%); } }
+  #wipe.sweeping{ animation:wipeSweep .7s var(--ease-smooth); }
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  .detail-topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
+  .detail-total{ background:rgba(0,132,71,.1); border:1px solid rgba(0,132,71,.4); border-radius:var(--r-pill); padding:8px 18px; display:flex; align-items:center; gap:10px; font-size:.8rem; }
+  .detail-total .amount{ font-family:'Fira Sans Black'; font-size:1rem; color:var(--green); }
+  .detail-total .amount.negative{ color:var(--red); }
+
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+  @media (max-width:680px){ .two-col{ grid-template-columns:1fr; } }
+
+  .field.has-slider{ border-bottom:none; padding-bottom:2px; }
+  .mini-slider-wrap{ padding:0 0 10px; border-bottom:1px solid rgba(214,243,255,.14); }
+  .mini-slider{ -webkit-appearance:none; appearance:none; width:100%; height:3px; border-radius:999px; background:rgba(214,243,255,.18); outline:none; display:block; cursor:pointer; }
+  .mini-slider::-webkit-slider-thumb{ -webkit-appearance:none; width:12px; height:12px; margin-top:-4.5px; border-radius:50%; background:var(--mist); border:2px solid var(--ink); cursor:pointer; }
+  .mini-slider::-moz-range-thumb{ width:12px; height:12px; border-radius:50%; background:var(--mist); border:2px solid var(--ink); cursor:pointer; border:none; }
+  .mini-slider::-moz-range-track{ height:3px; border-radius:999px; background:rgba(214,243,255,.18); }
+
+  .note-line{ margin-top:8px; font-size:.78rem; color:var(--grey3); }
+</style>
 </head>
 <body>
 <svg style="position:absolute;width:0;height:0" aria-hidden="true">
@@ -36,237 +85,49 @@
     <rect x="8" y="8" width="12" height="12"/><rect x="28" y="8" width="12" height="12"/><rect x="8" y="28" width="12" height="12"/>
     <rect x="28" y="34" width="6" height="6"/><rect x="34" y="28" width="6" height="6"/>
   </symbol>
+  <symbol id="icon-back" viewBox="0 0 24 24"><path d="M15 5 L7 12 L15 19"/></symbol>
 </defs>
 </svg>
 
 <div id="app">
   <main>
-    <div class="page">
+    <section id="view-hub" class="view active">
       <div class="page-hero">
         <span class="eyebrow" data-i18n="bfyEyebrow"></span>
         <h1 data-i18n-html="bfyTitleHtml"></h1>
         <p data-i18n="bfySub"></p>
       </div>
 
-      <p class="box-title" style="text-align:center;margin-bottom:14px" data-i18n="grwModuleHint"></p>
-      <div class="module-grid" id="moduleGrid">
-        <label class="module-card" data-mod="trans">
-          <input type="checkbox" checked>
-          <svg class="module-icon"><use href="#icon-trans"/></svg>
-          <span class="module-name" data-i18n="grwModTrans"></span>
-        </label>
-        <label class="module-card" data-mod="regnskap">
-          <input type="checkbox">
-          <svg class="module-icon"><use href="#icon-regnskap"/></svg>
-          <span class="module-name" data-i18n="grwModRegnskap"></span>
-        </label>
-        <label class="module-card" data-mod="multipay">
-          <input type="checkbox">
-          <svg class="module-icon"><use href="#icon-multipay"/></svg>
-          <span class="module-name" data-i18n="grwModMultipay"></span>
-        </label>
-        <label class="module-card" data-mod="booking">
-          <input type="checkbox">
-          <svg class="module-icon"><use href="#icon-booking"/></svg>
-          <span class="module-name" data-i18n="grwModBooking"></span>
-        </label>
-        <label class="module-card" data-mod="webshop">
-          <input type="checkbox">
-          <svg class="module-icon"><use href="#icon-webshop"/></svg>
-          <span class="module-name" data-i18n="grwModWebshop"></span>
-        </label>
-        <label class="module-card" data-mod="kiosk">
-          <input type="checkbox">
-          <svg class="module-icon"><use href="#icon-kiosk"/></svg>
-          <span class="module-name" data-i18n="grwModKiosk"></span>
-        </label>
-        <label class="module-card" data-mod="qr">
-          <input type="checkbox">
-          <svg class="module-icon"><use href="#icon-qr"/></svg>
-          <span class="module-name" data-i18n="grwModQr"></span>
-        </label>
+      <div class="orbit-wrap" id="orbitWrap">
+        <div class="orbit-ring"></div>
+        <div class="hub"><img src="../logo/wordmark-light.png" alt="munu."></div>
+        <div class="nodes" id="nodes"></div>
       </div>
 
-      <div class="box">
+      <div class="box" style="max-width:420px;margin:36px auto 0">
         <div class="result-total grand" style="margin-top:0">
-          <span data-i18n="fpTitle"></span><span class="amount" id="grandTotal"></span>
+          <span data-i18n="fpTitle"></span><span class="amount" id="grandTotalHub"></span>
         </div>
       </div>
+    </section>
 
-      <div id="moduleDetails">
-        <div class="module-detail" id="detail-trans">
-          <div class="split">
-            <div class="box">
-              <div class="module-detail-head"><h3 data-i18n="grwModTrans"></h3></div>
-              <div class="field"><label data-i18n="bfyTransOmsetning"></label><div class="field-input"><input type="number" id="t_omsetning" value="20020000"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="bfyTransAntall"></label><div class="field-input"><input type="number" id="t_antall" value="7000"></div></div>
-
-              <div class="box-title" style="margin-top:20px" data-i18n="bfyTransKonkHead"></div>
-              <div class="field"><label data-i18n="bfyTransKonkProsent"></label><div class="field-input"><input type="number" step="0.01" id="t_konkProsent" value="1.75"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="fieldProcessingFee"></label><div class="field-input"><input type="number" step="0.01" id="t_konkBehandling" value="0"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="bfyTotalFixedCost"></label><div class="field-input"><input type="number" id="t_konkFixed" value="275"><span class="unit">kr</span></div></div>
-
-              <div class="box-title" style="margin-top:20px" data-i18n="bfyTransMunuHead"></div>
-              <div class="field"><label data-i18n="bfyTransMunuProsent"></label><div class="field-input"><input type="number" step="0.01" id="t_munuProsent" value="0.55"><span class="unit">%</span></div></div>
-              <div class="preset-row" id="tierPresets">
-                <button type="button" class="preset-btn active" data-value="0.55">IC++ 0.55%</button>
-                <button type="button" class="preset-btn" data-value="0.60">Tier 8 0.60%</button>
-                <button type="button" class="preset-btn" data-value="0.70">Tier 1 0.70%</button>
-              </div>
-              <div class="field"><label data-i18n="fieldProcessingFee"></label><div class="field-input"><input type="number" step="0.01" id="t_munuBehandling" value="0.40"><span class="unit">kr</span></div></div>
-
-              <div class="box-title" style="margin-top:20px" data-i18n="hwSectionHead"></div>
-
-              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwKasse"></label></div>
-              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_kasse_qty" value="1"></div></div>
-              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_kasse_price" value="1014"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_kasse_setup" value="2500"><span class="unit">kr</span></div></div>
-
-              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwPrinter"></label></div>
-              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_printer_qty" value="0"></div></div>
-              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_printer_price" value="148"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_printer_setup" value="0"><span class="unit">kr</span></div></div>
-
-              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwAdyenTerminal"></label></div>
-              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_adyenTerminal_qty" value="1"></div></div>
-              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_adyenTerminal_price" value="349"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_adyenTerminal_setup" value="750"><span class="unit">kr</span></div></div>
-
-              <div class="field" style="border-bottom:none;padding-bottom:4px"><label data-i18n="hwAdyenPos"></label></div>
-              <div class="field"><label data-i18n="hwQty"></label><div class="field-input"><input type="number" id="hw_adyenPos_qty" value="0"></div></div>
-              <div class="field"><label data-i18n="hwPriceMonth"></label><div class="field-input"><input type="number" id="hw_adyenPos_price" value="876"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="hwSetupUnit"></label><div class="field-input"><input type="number" id="hw_adyenPos_setup" value="750"><span class="unit">kr</span></div></div>
-            </div>
-            <div class="box">
-              <div class="box-title" data-i18n="bfyTransBoxTitle"></div>
-              <div id="trans_rows"></div>
-              <div class="result-total"><span data-i18n="bfyResSavings"></span><span class="amount" id="trans_savings"></span></div>
-            </div>
+    <section id="view-detail" class="view">
+      <div class="page" style="padding-top:0">
+        <div class="detail-topbar">
+          <button type="button" class="back-btn" id="backBtn">
+            <svg viewBox="0 0 24 24"><use href="#icon-back"/></svg>
+            <span data-i18n="hdrBack"></span>
+          </button>
+          <div class="detail-total">
+            <span data-i18n="fpTitle"></span><span class="amount" id="grandTotalDetail"></span>
           </div>
         </div>
-
-        <div class="module-detail" id="detail-regnskap" hidden>
-          <div class="split">
-            <div class="box">
-              <div class="module-detail-head"><h3 data-i18n="grwModRegnskap"></h3></div>
-              <div class="field"><label data-i18n="bfyInvisFrekvens"></label><div class="field-input">
-                <select id="regn_frekvens">
-                  <option value="52" data-i18n="bfyFreqWeek"></option>
-                  <option value="12" selected data-i18n="bfyFreqMonth"></option>
-                  <option value="4" data-i18n="bfyFreqQuarter"></option>
-                </select></div></div>
-              <div class="field"><label data-i18n="bfyInvisRegnPris"></label><div class="field-input"><input type="number" id="regn_pris" value="1200"><span class="unit">kr/t</span></div></div>
-              <div class="field"><label data-i18n="bfyInvisRegnMin"></label><div class="field-input"><input type="number" id="regn_min" value="45"><span class="unit">min</span></div></div>
-              <div class="field"><label data-i18n="bfyInvisStabPris"></label><div class="field-input"><input type="number" id="regn_stabPris" value="450"><span class="unit">kr/t</span></div></div>
-              <div class="field"><label data-i18n="bfyInvisStabMin"></label><div class="field-input"><input type="number" id="regn_stabMin" value="90"><span class="unit">min</span></div></div>
-              <div class="field"><label data-i18n="grwRegnModulkost"></label><div class="field-input"><input type="number" id="regn_modulkost" value="349"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwRegnSetup"></label><div class="field-input"><input type="number" id="regn_setup" value="3000"><span class="unit">kr</span></div></div>
-            </div>
-            <div class="box">
-              <div class="box-title" data-i18n="resSavings"></div>
-              <div id="regn_rows"></div>
-              <div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="regn_net"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-detail" id="detail-multipay" hidden>
-          <div class="split">
-            <div class="box">
-              <div class="module-detail-head"><h3 data-i18n="grwModMultipay"></h3></div>
-              <div class="field"><label data-i18n="grwMpDaily"></label><div class="field-input"><input type="number" id="mp_daily" value="30000"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwMpPeakShare"></label><div class="field-input"><input type="number" id="mp_peakShare" value="40"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwMpHelgedager"></label><div class="field-input"><input type="number" id="mp_helgedager" value="96"></div></div>
-              <div class="range-row">
-                <div class="range-row-head"><label data-i18n="grwMpGrowth"></label><span class="range-value" id="mp_growthLabel">30 %</span></div>
-                <input type="range" id="mp_growthSlider" min="5" max="60" value="30">
-                <div class="range-minmax"><span>5 %</span><span>60 %</span></div>
-              </div>
-              <div class="field"><label data-i18n="grwMpGrowthCustom"></label><div class="field-input"><input type="number" id="mp_growthCustom" value="30"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwMpModulkost"></label><div class="field-input"><input type="number" id="mp_modulkost" value="235"><span class="unit">kr</span></div></div>
-            </div>
-            <div class="box">
-              <div class="box-title" data-i18n="grwResPerAr"></div>
-              <div id="mp_rows"></div>
-              <div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="mp_net"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-detail" id="detail-booking" hidden>
-          <div class="split">
-            <div class="box">
-              <div class="module-detail-head"><h3 data-i18n="grwModBooking"></h3></div>
-              <div class="field"><label data-i18n="grwBkSnittbord"></label><div class="field-input"><input type="number" id="bk_snittbord" value="850"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwBkAntall"></label><div class="field-input"><input type="number" id="bk_antall" value="400"></div></div>
-              <div class="field"><label data-i18n="grwBkNoShowFor"></label><div class="field-input"><input type="number" step="0.1" id="bk_noShowFor" value="12"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwBkNoShowEtter"></label><div class="field-input"><input type="number" step="0.1" id="bk_noShowEtter" value="4"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwBkModulkost"></label><div class="field-input"><input type="number" id="bk_modulkost" value="900"><span class="unit">kr</span></div></div>
-            </div>
-            <div class="box">
-              <div class="box-title" data-i18n="resRevenueIncrease"></div>
-              <div id="bk_rows"></div>
-              <div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="bk_net"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-detail" id="detail-webshop" hidden>
-          <div class="split">
-            <div class="box">
-              <div class="module-detail-head"><h3 data-i18n="grwModWebshop"></h3></div>
-              <div class="field"><label data-i18n="grwWsEkstraOms"></label><div class="field-input"><input type="number" id="ws_ekstraOms" value="60000"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwWsMargin"></label><div class="field-input"><input type="number" id="ws_margin" value="65"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwWsDrift"></label><div class="field-input"><input type="number" id="ws_drift" value="2500"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwWsTrans"></label><div class="field-input"><input type="number" step="0.01" id="ws_trans" value="1.75"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwWsModulkost"></label><div class="field-input"><input type="number" id="ws_modulkost" value="1385"><span class="unit">kr</span></div></div>
-            </div>
-            <div class="box">
-              <div class="box-title" data-i18n="resRevenueIncrease"></div>
-              <div id="ws_rows"></div>
-              <div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="ws_net"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-detail" id="detail-kiosk" hidden>
-          <div class="split">
-            <div class="box">
-              <div class="module-detail-head"><h3 data-i18n="grwModKiosk"></h3></div>
-              <div class="field"><label data-i18n="grwKiArsverk"></label><div class="field-input"><input type="number" step="0.1" id="ki_arsverk" value="1"></div></div>
-              <div class="field"><label data-i18n="grwKiLonn"></label><div class="field-input"><input type="number" id="ki_lonn" value="420000"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwKiModulkost"></label><div class="field-input"><input type="number" id="ki_modulkost" value="1499"><span class="unit">kr</span></div></div>
-            </div>
-            <div class="box">
-              <div class="box-title" data-i18n="resSavings"></div>
-              <div id="ki_rows"></div>
-              <div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="ki_net"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="module-detail" id="detail-qr" hidden>
-          <div class="split">
-            <div class="box">
-              <div class="module-detail-head"><h3 data-i18n="grwModQr"></h3></div>
-              <div class="field"><label data-i18n="grwQrSnittordreFor"></label><div class="field-input"><input type="number" id="qr_snittordre" value="280"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwQrOkning"></label><div class="field-input"><input type="number" id="qr_okning" value="15"><span class="unit">%</span></div></div>
-              <div class="field"><label data-i18n="grwQrAntallOrdrer"></label><div class="field-input"><input type="number" id="qr_antallOrdrer" value="750"></div></div>
-              <div class="field"><label data-i18n="grwQrBemanningskutt"></label><div class="field-input"><input type="number" step="0.1" id="qr_bemanning" value="0"></div></div>
-              <div class="field"><label data-i18n="grwKiLonn"></label><div class="field-input"><input type="number" id="qr_lonn" value="420000"><span class="unit">kr</span></div></div>
-              <div class="field"><label data-i18n="grwQrModulkost"></label><div class="field-input"><input type="number" id="qr_modulkost" value="1385"><span class="unit">kr</span></div></div>
-            </div>
-            <div class="box">
-              <div class="box-title" data-i18n="resRevenueIncrease"></div>
-              <div id="qr_rows"></div>
-              <div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="qr_net"></span></div>
-            </div>
-          </div>
-        </div>
+        <div id="detailBody"></div>
       </div>
-    </div>
+    </section>
   </main>
   <footer class="appfoot">munu. &mdash; at your service</footer>
+  <div id="wipe" aria-hidden="true"></div>
 </div>
 
 <script src="../shared/i18n.js"></script>
@@ -288,16 +149,34 @@
   function infoRow(labelKey, text){
     return '<div class="result-row"><span>'+t(labelKey)+'</span><span class="amount info">'+text+'</span></div>';
   }
-
   function setAmount(el, value){
     el.textContent = fmt(value);
     el.classList.toggle("negative", value < 0);
   }
-
-  function updateGrandTotal(){
-    setAmount(document.getElementById("grandTotal"), window.MunuState.totalNet());
+  function field(id, labelKey, value, opts){
+    opts = opts || {};
+    var unit = opts.unit ? '<span class="unit">'+opts.unit+'</span>' : '';
+    var step = opts.step !== undefined ? ' step="'+opts.step+'"' : '';
+    var html = '<div class="field'+(opts.slider?' has-slider':'')+'"><label data-i18n="'+labelKey+'"></label>'+
+      '<div class="field-input"><input type="number" id="'+id+'" value="'+value+'"'+step+'>'+unit+'</div></div>';
+    if(opts.slider){
+      html += '<div class="mini-slider-wrap"><input type="range" class="mini-slider" data-for="'+id+'" min="'+opts.slider.min+'" max="'+opts.slider.max+'" step="'+(opts.slider.step||opts.step||1)+'" value="'+value+'"></div>';
+    }
+    return html;
+  }
+  function includeRow(mod){
+    return '<label class="check-row" style="margin-top:0;margin-bottom:18px"><input type="checkbox" id="inc_'+mod+'"'+(mod==="trans"?" checked":"")+'><span data-i18n="bfyInclude"></span></label>';
   }
 
+  var MODULES = [
+    { id:"trans", icon:"icon-trans", labelKey:"grwModTrans" },
+    { id:"regnskap", icon:"icon-regnskap", labelKey:"grwModRegnskap" },
+    { id:"multipay", icon:"icon-multipay", labelKey:"grwModMultipay" },
+    { id:"booking", icon:"icon-booking", labelKey:"grwModBooking" },
+    { id:"webshop", icon:"icon-webshop", labelKey:"grwModWebshop" },
+    { id:"kiosk", icon:"icon-kiosk", labelKey:"grwModKiosk" },
+    { id:"qr", icon:"icon-qr", labelKey:"grwModQr" }
+  ];
   var LABELS = {
     trans:{ no:"Transaksjonskostnad", en:"Transaction cost" },
     regnskap:{ no:"Regnskapsintegrasjon", en:"Accounting integration" },
@@ -308,16 +187,213 @@
     qr:{ no:"Selvbetjent QR", en:"Self-service QR" }
   };
 
-  // ---------- transaction cost ----------
-  var HW_ITEMS = ["kasse", "printer", "adyenTerminal", "adyenPos"];
+  // ---------------- build detail bodies ----------------
+  var detailBody = document.getElementById("detailBody");
 
-  function hardwareTotals(){
-    var monthly = 0, setup = 0;
-    HW_ITEMS.forEach(function(key){
-      monthly += num("hw_" + key + "_qty") * num("hw_" + key + "_price");
-      setup += num("hw_" + key + "_qty") * num("hw_" + key + "_setup");
-    });
-    return { monthly:monthly, setup:setup };
+  function buildTransBody(){
+    return (
+      '<div class="module-detail-head"><h3 data-i18n="grwModTrans"></h3></div>' +
+      includeRow("trans") +
+      '<div class="box">' +
+        field("t_omsetning", "bfyTransOmsetning", 20020000, { unit:"kr", slider:{min:0,max:50000000,step:10000} }) +
+        field("t_antall", "bfyTransAntall", 7000, { slider:{min:0,max:50000,step:100} }) +
+      '</div>' +
+      '<div class="two-col" style="margin-top:20px">' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="bfyTransKonkHead"></div>' +
+          field("t_konkProsent", "bfyTransKonkProsent", 1.75, { unit:"%", step:0.01, slider:{min:0,max:5,step:0.01} }) +
+          field("t_konkBehandling", "fieldProcessingFee", 0, { unit:"kr", step:0.01, slider:{min:0,max:10,step:0.01} }) +
+          field("t_konkFixed", "bfyTotalFixedCost", 275, { unit:"kr", slider:{min:0,max:10000,step:50} }) +
+        '</div>' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="bfyTransMunuHead"></div>' +
+          field("t_munuProsent", "bfyTransMunuProsent", 0.55, { unit:"%", step:0.01, slider:{min:0,max:5,step:0.01} }) +
+          '<div class="preset-row" id="tierPresets">' +
+            '<button type="button" class="preset-btn active" data-value="0.55">IC++ 0.55%</button>' +
+            '<button type="button" class="preset-btn" data-value="0.60">Tier 8 0.60%</button>' +
+            '<button type="button" class="preset-btn" data-value="0.70">Tier 1 0.70%</button>' +
+          '</div>' +
+          field("t_munuBehandling", "fieldProcessingFee", 0.40, { unit:"kr", step:0.01, slider:{min:0,max:10,step:0.01} }) +
+          '<div class="box-title" style="margin-top:16px" data-i18n="hwSectionHead"></div>' +
+          '<div class="field" style="border-bottom:none;padding-bottom:2px"><label data-i18n="hwKasse"></label></div>' +
+          field("hw_kasse_qty", "hwQty", 1, {}) +
+          field("hw_kasse_price", "hwPriceMonth", 1014, { unit:"kr" }) +
+          '<div class="field" style="border-bottom:none;padding-bottom:2px"><label data-i18n="hwPrinter"></label></div>' +
+          field("hw_printer_qty", "hwQty", 0, {}) +
+          field("hw_printer_price", "hwPriceMonth", 148, { unit:"kr" }) +
+          '<div class="field" style="border-bottom:none;padding-bottom:2px"><label data-i18n="hwAdyenTerminal"></label></div>' +
+          field("hw_adyenTerminal_qty", "hwQty", 1, {}) +
+          field("hw_adyenTerminal_price", "hwPriceMonth", 349, { unit:"kr" }) +
+          '<div class="field" style="border-bottom:none;padding-bottom:2px"><label data-i18n="hwAdyenPos"></label></div>' +
+          field("hw_adyenPos_qty", "hwQty", 0, {}) +
+          field("hw_adyenPos_price", "hwPriceMonth", 876, { unit:"kr" }) +
+        '</div>' +
+      '</div>' +
+      '<div class="box" style="margin-top:20px">' +
+        field("t_setupTotal", "bfySetupTotal", 0, { unit:"kr", slider:{min:0,max:100000,step:500} }) +
+        '<p class="note-line" data-i18n="bfySetupNote"></p>' +
+      '</div>' +
+      '<div class="box" style="margin-top:20px">' +
+        '<div class="box-title" data-i18n="bfyTransBoxTitle"></div>' +
+        '<div id="trans_rows"></div>' +
+        '<div class="result-total"><span data-i18n="bfyResSavings"></span><span class="amount" id="trans_savings"></span></div>' +
+      '</div>'
+    );
+  }
+
+  function buildRegnskapBody(){
+    return (
+      '<div class="module-detail-head"><h3 data-i18n="grwModRegnskap"></h3></div>' +
+      includeRow("regnskap") +
+      '<div class="two-col">' +
+        '<div class="box">' +
+          '<div class="field"><label data-i18n="bfyInvisFrekvens"></label><div class="field-input"><select id="regn_frekvens">' +
+            '<option value="52" data-i18n="bfyFreqWeek"></option>' +
+            '<option value="12" selected data-i18n="bfyFreqMonth"></option>' +
+            '<option value="4" data-i18n="bfyFreqQuarter"></option>' +
+          '</select></div></div>' +
+          field("regn_pris", "bfyInvisRegnPris", 1200, { unit:"kr/t", slider:{min:0,max:3000,step:50} }) +
+          field("regn_min", "bfyInvisRegnMin", 45, { unit:"min", slider:{min:0,max:180,step:5} }) +
+          field("regn_stabPris", "bfyInvisStabPris", 450, { unit:"kr/t", slider:{min:0,max:1500,step:25} }) +
+          field("regn_stabMin", "bfyInvisStabMin", 90, { unit:"min", slider:{min:0,max:300,step:10} }) +
+          field("regn_modulkost", "grwRegnModulkost", 349, { unit:"kr", slider:{min:0,max:2000,step:10} }) +
+          field("regn_setup", "grwRegnSetup", 3000, { unit:"kr", slider:{min:0,max:10000,step:100} }) +
+        '</div>' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="resSavings"></div>' +
+          '<div id="regn_rows"></div>' +
+          '<div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="regn_net"></span></div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildMultipayBody(){
+    return (
+      '<div class="module-detail-head"><h3 data-i18n="grwModMultipay"></h3></div>' +
+      includeRow("multipay") +
+      '<div class="two-col">' +
+        '<div class="box">' +
+          field("mp_daily", "grwMpDaily", 30000, { unit:"kr", slider:{min:0,max:200000,step:1000} }) +
+          field("mp_peakShare", "grwMpPeakShare", 40, { unit:"%", slider:{min:0,max:100,step:1} }) +
+          field("mp_helgedager", "grwMpHelgedager", 96, { slider:{min:0,max:365,step:1} }) +
+          '<div class="range-row">' +
+            '<div class="range-row-head"><label data-i18n="grwMpGrowth"></label><span class="range-value" id="mp_growthLabel">30 %</span></div>' +
+            '<input type="range" id="mp_growthSlider" min="5" max="60" value="30">' +
+            '<div class="range-minmax"><span>5 %</span><span>60 %</span></div>' +
+          '</div>' +
+          field("mp_growthCustom", "grwMpGrowthCustom", 30, { unit:"%" }) +
+          field("mp_modulkost", "grwMpModulkost", 235, { unit:"kr", slider:{min:0,max:2000,step:10} }) +
+        '</div>' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="grwResPerAr"></div>' +
+          '<div id="mp_rows"></div>' +
+          '<div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="mp_net"></span></div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildBookingBody(){
+    return (
+      '<div class="module-detail-head"><h3 data-i18n="grwModBooking"></h3></div>' +
+      includeRow("booking") +
+      '<div class="two-col">' +
+        '<div class="box">' +
+          field("bk_snittbord", "grwBkSnittbord", 850, { unit:"kr", slider:{min:0,max:5000,step:50} }) +
+          field("bk_antall", "grwBkAntall", 400, { slider:{min:0,max:2000,step:10} }) +
+          field("bk_noShowFor", "grwBkNoShowFor", 12, { unit:"%", step:0.1, slider:{min:0,max:100,step:0.5} }) +
+          field("bk_noShowEtter", "grwBkNoShowEtter", 4, { unit:"%", step:0.1, slider:{min:0,max:100,step:0.5} }) +
+          field("bk_modulkost", "grwBkModulkost", 900, { unit:"kr", slider:{min:0,max:3000,step:10} }) +
+        '</div>' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="resRevenueIncrease"></div>' +
+          '<div id="bk_rows"></div>' +
+          '<div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="bk_net"></span></div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildWebshopBody(){
+    return (
+      '<div class="module-detail-head"><h3 data-i18n="grwModWebshop"></h3></div>' +
+      includeRow("webshop") +
+      '<div class="two-col">' +
+        '<div class="box">' +
+          field("ws_ekstraOms", "grwWsEkstraOms", 60000, { unit:"kr", slider:{min:0,max:500000,step:1000} }) +
+          field("ws_margin", "grwWsMargin", 65, { unit:"%", slider:{min:0,max:100,step:1} }) +
+          field("ws_drift", "grwWsDrift", 2500, { unit:"kr", slider:{min:0,max:50000,step:500} }) +
+          field("ws_trans", "grwWsTrans", 1.75, { unit:"%", step:0.01, slider:{min:0,max:5,step:0.01} }) +
+          field("ws_modulkost", "grwWsModulkost", 1385, { unit:"kr", slider:{min:0,max:3000,step:10} }) +
+        '</div>' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="resRevenueIncrease"></div>' +
+          '<div id="ws_rows"></div>' +
+          '<div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="ws_net"></span></div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildKioskBody(){
+    return (
+      '<div class="module-detail-head"><h3 data-i18n="grwModKiosk"></h3></div>' +
+      includeRow("kiosk") +
+      '<div class="two-col">' +
+        '<div class="box">' +
+          field("ki_arsverk", "grwKiArsverk", 1, { step:0.1, slider:{min:0,max:10,step:0.1} }) +
+          field("ki_lonn", "grwKiLonn", 420000, { unit:"kr", slider:{min:0,max:1000000,step:5000} }) +
+          field("ki_modulkost", "grwKiModulkost", 1499, { unit:"kr", slider:{min:0,max:3000,step:10} }) +
+        '</div>' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="resSavings"></div>' +
+          '<div id="ki_rows"></div>' +
+          '<div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="ki_net"></span></div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function buildQrBody(){
+    return (
+      '<div class="module-detail-head"><h3 data-i18n="grwModQr"></h3></div>' +
+      includeRow("qr") +
+      '<div class="two-col">' +
+        '<div class="box">' +
+          field("qr_snittordre", "grwQrSnittordreFor", 280, { unit:"kr", slider:{min:0,max:2000,step:10} }) +
+          field("qr_okning", "grwQrOkning", 15, { unit:"%", slider:{min:0,max:100,step:1} }) +
+          field("qr_antallOrdrer", "grwQrAntallOrdrer", 750, { slider:{min:0,max:10000,step:50} }) +
+          field("qr_bemanning", "grwQrBemanningskutt", 0, { step:0.1, slider:{min:0,max:10,step:0.1} }) +
+          field("qr_lonn", "grwKiLonn", 420000, { unit:"kr", slider:{min:0,max:1000000,step:5000} }) +
+          field("qr_modulkost", "grwQrModulkost", 1385, { unit:"kr", slider:{min:0,max:3000,step:10} }) +
+        '</div>' +
+        '<div class="box">' +
+          '<div class="box-title" data-i18n="resRevenueIncrease"></div>' +
+          '<div id="qr_rows"></div>' +
+          '<div class="result-total"><span data-i18n="resNet"></span><span class="amount" id="qr_net"></span></div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  var BUILDERS = { trans:buildTransBody, regnskap:buildRegnskapBody, multipay:buildMultipayBody, booking:buildBookingBody, webshop:buildWebshopBody, kiosk:buildKioskBody, qr:buildQrBody };
+
+  MODULES.forEach(function(m){
+    var wrap = document.createElement("div");
+    wrap.className = "module-detail";
+    wrap.id = "detail-" + m.id;
+    wrap.hidden = true;
+    wrap.innerHTML = BUILDERS[m.id]();
+    detailBody.appendChild(wrap);
+  });
+
+  // ---------------- compute functions ----------------
+  var HW_ITEMS = ["kasse", "printer", "adyenTerminal", "adyenPos"];
+  function hardwareMonthly(){
+    var monthly = 0;
+    HW_ITEMS.forEach(function(key){ monthly += num("hw_" + key + "_qty") * num("hw_" + key + "_price"); });
+    return monthly;
   }
 
   function renderTrans(){
@@ -326,10 +402,9 @@
     var konkFixed = num("t_konkFixed");
     var konkKost = omsetning * (num("t_konkProsent")/100) + antall * num("t_konkBehandling") + konkFixed * 12;
 
-    var hw = hardwareTotals();
-    var munuFixed = hw.monthly;
+    var munuFixed = hardwareMonthly();
     var munuKost = omsetning * (num("t_munuProsent")/100) + antall * num("t_munuBehandling") + munuFixed * 12;
-    var setupTotal = hw.setup;
+    var setupTotal = num("t_setupTotal");
     var savings = konkKost - munuKost - setupTotal;
 
     var A = (num("t_konkProsent") - num("t_munuProsent")) / 100;
@@ -355,14 +430,6 @@
 
     return { annualSavings:savings, annualRevenueIncrease:0, annualNetResult:savings };
   }
-
-  document.querySelectorAll("#tierPresets .preset-btn").forEach(function(b){
-    b.addEventListener("click", function(){
-      document.getElementById("t_munuProsent").value = b.dataset.value;
-      document.querySelectorAll("#tierPresets .preset-btn").forEach(function(x){ x.classList.toggle("active", x === b); });
-      syncModule("trans");
-    });
-  });
 
   function renderRegnskap(){
     var freq = num("regn_frekvens");
@@ -470,14 +537,28 @@
   }
 
   var RENDERERS = { trans:renderTrans, regnskap:renderRegnskap, multipay:renderMultipay, booking:renderBooking, webshop:renderWebshop, kiosk:renderKiosk, qr:renderQr };
-  var MODS = Object.keys(RENDERERS);
+
+  // ---------------- sync / totals / nodes ----------------
+  function updateGrandTotal(){
+    var total = window.MunuState.totalNet();
+    setAmount(document.getElementById("grandTotalHub"), total);
+    setAmount(document.getElementById("grandTotalDetail"), total);
+  }
+
+  function updateNode(mod){
+    var node = document.querySelector('.node[data-mod="'+mod+'"]');
+    if(!node) return;
+    var state = window.MunuState.getState();
+    var entry = state["calc-" + mod];
+    var included = !!(entry && entry.includedInTotal);
+    node.classList.toggle("included", included);
+    var amountEl = node.querySelector(".node-amount");
+    amountEl.textContent = included ? fmt(entry.annualNetResult || 0) : "";
+  }
 
   function syncModule(mod){
     var result = RENDERERS[mod]();
-    var card = document.querySelector('.module-card[data-mod="'+mod+'"]');
-    var checked = card.querySelector("input[type=checkbox]").checked;
-    document.getElementById("detail-" + mod).hidden = !checked;
-    card.classList.toggle("on", checked);
+    var checked = document.getElementById("inc_" + mod).checked;
     if(checked){
       window.MunuState.setCalculator("calc-" + mod, {
         label: LABELS[mod],
@@ -489,21 +570,28 @@
     } else {
       window.MunuState.clearCalculator("calc-" + mod);
     }
+    updateNode(mod);
     updateGrandTotal();
   }
 
-  function renderAllModules(){ MODS.forEach(syncModule); }
+  function syncAll(){ MODULES.forEach(function(m){ syncModule(m.id); }); }
 
-  document.querySelectorAll(".module-card input[type=checkbox]").forEach(function(cb){
-    cb.addEventListener("change", function(){
-      syncModule(cb.closest(".module-card").dataset.mod);
-    });
+  document.querySelectorAll('#detailBody input[type=checkbox][id^="inc_"]').forEach(function(cb){
+    cb.addEventListener("change", function(){ syncModule(cb.id.replace("inc_", "")); });
   });
-
   document.querySelectorAll(".module-detail input, .module-detail select").forEach(function(el){
+    if(el.type === "checkbox") return;
     var handler = function(){ syncModule(el.closest(".module-detail").id.replace("detail-", "")); };
     el.addEventListener("input", handler);
     el.addEventListener("change", handler);
+  });
+
+  document.querySelectorAll("#tierPresets .preset-btn").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.getElementById("t_munuProsent").value = b.dataset.value;
+      document.querySelectorAll("#tierPresets .preset-btn").forEach(function(x){ x.classList.toggle("active", x === b); });
+      syncModule("trans");
+    });
   });
 
   var mpSlider = document.getElementById("mp_growthSlider");
@@ -521,9 +609,86 @@
     syncModule("multipay");
   });
 
-  document.addEventListener("munu:langchange", renderAllModules);
+  document.querySelectorAll(".mini-slider").forEach(function(rangeEl){
+    var numberEl = document.getElementById(rangeEl.dataset.for);
+    if(!numberEl) return;
+    rangeEl.value = numberEl.value;
+    rangeEl.addEventListener("input", function(){
+      numberEl.value = rangeEl.value;
+      numberEl.dispatchEvent(new Event("input", { bubbles:true }));
+    });
+    numberEl.addEventListener("input", function(){
+      var v = parseFloat(numberEl.value);
+      if(isNaN(v)) return;
+      var min = parseFloat(rangeEl.min), max = parseFloat(rangeEl.max);
+      if(v >= min && v <= max) rangeEl.value = v;
+    });
+  });
 
-  renderAllModules();
+  // ---------------- wheel nodes + navigation ----------------
+  var nodesEl = document.getElementById("nodes");
+  var wipeEl = document.getElementById("wipe");
+
+  function buildNodes(){
+    MODULES.forEach(function(m){
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "node";
+      btn.dataset.mod = m.id;
+      btn.innerHTML =
+        '<svg class="node-icon"><use href="#'+m.icon+'"/></svg>'+
+        '<span class="node-label" data-i18n="'+m.labelKey+'"></span>'+
+        '<span class="node-amount"></span>';
+      btn.addEventListener("click", function(){ openModule(m.id); });
+      nodesEl.appendChild(btn);
+    });
+  }
+
+  function layoutOrbit(){
+    var rect = nodesEl.getBoundingClientRect();
+    var cx = rect.width/2, cy = rect.height/2;
+    var radius = Math.min(rect.width, rect.height)/2 - 6;
+    var items = nodesEl.querySelectorAll(".node");
+    items.forEach(function(el, i){
+      var angle = (i/MODULES.length)*Math.PI*2 - Math.PI/2;
+      var x = cx + radius*Math.cos(angle);
+      var y = cy + radius*Math.sin(angle);
+      el.style.left = (x - el.offsetWidth/2)+"px";
+      el.style.top = (y - el.offsetHeight/2)+"px";
+    });
+  }
+
+  function debounce(fn, ms){ var tm; return function(){ clearTimeout(tm); tm = setTimeout(fn, ms); }; }
+
+  function swapView(view, mod){
+    document.getElementById("view-hub").classList.toggle("active", view === "hub");
+    document.getElementById("view-detail").classList.toggle("active", view === "detail");
+    if(view === "detail" && mod){
+      MODULES.forEach(function(m){ document.getElementById("detail-" + m.id).hidden = (m.id !== mod); });
+      window.scrollTo(0,0);
+    }
+  }
+
+  function wipeTo(view, mod){
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if(reduced){ swapView(view, mod); return; }
+    wipeEl.classList.remove("sweeping");
+    void wipeEl.offsetWidth;
+    wipeEl.classList.add("sweeping");
+    setTimeout(function(){ swapView(view, mod); }, 400);
+    setTimeout(function(){ wipeEl.classList.remove("sweeping"); }, 820);
+  }
+
+  function openModule(id){ wipeTo("detail", id); }
+
+  document.getElementById("backBtn").addEventListener("click", function(){ wipeTo("hub"); });
+
+  document.addEventListener("munu:langchange", syncAll);
+
+  buildNodes();
+  layoutOrbit();
+  window.addEventListener("resize", debounce(layoutOrbit, 150));
+  syncAll();
 })();
 </script>
 </body>

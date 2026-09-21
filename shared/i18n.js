@@ -19,7 +19,8 @@
 
       bfyEyebrow:"MUNU - NO HIDDEN COSTS",
       bfyTitleHtml:"Find the <em>leak</em>",
-      bfySub:"Kryss av det som er relevant for din bedrift, og se effekten bygge seg opp i sanntid.",
+      bfySub:"Velg en kalkulator, og se effekten bygge seg opp i sanntid.",
+      bfyInclude:"Inkluder i total",
 
       bfyTransBoxTitle:"Transaksjonskostnad",
       bfyTransOmsetning:"Omsetning per år",
@@ -34,10 +35,11 @@
       bfyResMunuKost:"Kostnad med Munu per år",
       bfyResSavings:"Besparelse per år",
       bfySetupTotal:"Engangskostnad oppsett",
+      bfySetupNote:"Fri sum — dette er ofte der vi gir mest rabatt",
 
       hwSectionHead:"Munu maskinvare",
       hwKasse:"Kasse", hwPrinter:"Printer", hwAdyenTerminal:"Adyen bankterminal", hwAdyenPos:"Adyen med POS",
-      hwQty:"Antall", hwPriceMonth:"Pris per måned", hwSetupUnit:"Engangskostnad oppsett per enhet",
+      hwQty:"Antall", hwPriceMonth:"Pris per måned",
 
       breakevenRevenue:"Breakeven omsetning",
       breakevenRevenueYear:"Breakeven ekstra omsetning per år",
@@ -47,7 +49,7 @@
       alwaysProfitable:"Alltid lønnsomt med disse tallene",
       neverProfitable:"Ikke lønnsomt med disse tallene",
 
-      grwModuleHint:"Kryss av modulene du vil regne på",
+      grwModuleHint:"Velg en kalkulator",
       grwModTrans:"Transaksjonskostnad",
       grwModRegnskap:"Regnskapsintegrasjon", grwModMultipay:"Multipay", grwModBooking:"Booking",
       grwModWebshop:"Webshop Takeaway", grwModKiosk:"Kiosk", grwModQr:"Selvbetjent QR",
@@ -99,7 +101,8 @@
 
       bfyEyebrow:"MUNU - NO HIDDEN COSTS",
       bfyTitleHtml:"Find the <em>leak</em>",
-      bfySub:"Tick what's relevant for your business, and watch the effect build up in real time.",
+      bfySub:"Choose a calculator, and watch the effect build up in real time.",
+      bfyInclude:"Include in total",
 
       bfyTransBoxTitle:"Transaction cost",
       bfyTransOmsetning:"Revenue per year",
@@ -114,10 +117,11 @@
       bfyResMunuKost:"Cost with Munu per year",
       bfyResSavings:"Savings per year",
       bfySetupTotal:"One-time setup cost",
+      bfySetupNote:"Open figure — this is usually where we give the most discount",
 
       hwSectionHead:"Munu hardware",
       hwKasse:"Till", hwPrinter:"Printer", hwAdyenTerminal:"Adyen card terminal", hwAdyenPos:"Adyen with POS",
-      hwQty:"Quantity", hwPriceMonth:"Price per month", hwSetupUnit:"One-time setup cost per unit",
+      hwQty:"Quantity", hwPriceMonth:"Price per month",
 
       breakevenRevenue:"Breakeven revenue",
       breakevenRevenueYear:"Breakeven extra revenue per year",
@@ -127,7 +131,7 @@
       alwaysProfitable:"Always profitable with these numbers",
       neverProfitable:"Not profitable with these numbers",
 
-      grwModuleHint:"Tick the modules you want to calculate",
+      grwModuleHint:"Choose a calculator",
       grwModTrans:"Transaction cost",
       grwModRegnskap:"Accounting integration", grwModMultipay:"Multipay", grwModBooking:"Booking",
       grwModWebshop:"Webshop Takeaway", grwModKiosk:"Kiosk", grwModQr:"Self-service QR",

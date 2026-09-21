@@ -197,20 +197,6 @@ footer.appfoot{ text-align:center; padding:18px; font-size:.72rem; color:var(--g
 .check-row{ display:flex; align-items:center; gap:10px; font-size:.88rem; color:var(--mist); margin-top:18px; }
 .check-row input[type=checkbox]{ width:18px; height:18px; accent-color:var(--bloom); cursor:pointer; flex:0 0 auto; }
 
-/* ---------- module cards (growth) ---------- */
-.module-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:28px; }
-.module-card{
-  position:relative; display:flex; flex-direction:column; gap:10px; padding:18px 16px; text-align:left;
-  background:rgba(214,243,255,.05); border:1px solid rgba(214,243,255,.2); border-radius:var(--r-md);
-  transition:background .2s var(--ease-snap), border-color .2s var(--ease-snap);
-  cursor:pointer;
-}
-.module-card input[type=checkbox]{ position:absolute; top:14px; right:14px; width:18px; height:18px; accent-color:var(--bloom); cursor:pointer; }
-.module-card .module-icon{ width:28px; height:28px; stroke:var(--mist); fill:none; stroke-width:2.2; }
-.module-card .module-name{ font-family:'Inter SemiBold'; font-size:.92rem; }
-.module-card.on{ border-color:var(--bloom); background:rgba(241,183,242,.08); }
-.module-card.on .module-icon{ stroke:var(--bloom); }
-
 .module-detail{ margin-top:20px; }
 .module-detail-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:16px; }
 .module-detail-head h3{ font-size:1.15rem; }
