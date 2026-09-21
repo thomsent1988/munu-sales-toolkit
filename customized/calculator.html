@@ -231,15 +231,15 @@
             '<button type="button" class="preset-btn" data-value="0.70">Tier 1 0.70%</button>' +
           '</div>' +
           field("t_munuBehandling", "fieldProcessingFee", 0.40, { unit:"kr", step:0.01 }) +
-          '<div class="box-title" style="margin-top:10px" data-i18n="hwSectionHead"></div>' +
-          '<div class="hw-head"><span data-i18n="hwQty"></span><span data-i18n="hwPriceMonth"></span></div>' +
-          hwRow("kasse", "hwKasse", 1, 1014) +
-          hwRow("adyenTerminal", "hwAdyenTerminal", 1, 349) +
-          hwRow("adyenPos", "hwAdyenPos", 0, 876) +
+          field("t_setupTotal", "bfySetupTotal", 0, { unit:"kr" }) +
         '</div>' +
       '</div>' +
       '<div class="box" style="margin-top:20px">' +
-        field("t_setupTotal", "bfySetupTotal", 0, { unit:"kr", slider:{min:0,max:100000,step:500} }) +
+        '<div class="box-title" data-i18n="hwSectionHead"></div>' +
+        '<div class="hw-head"><span data-i18n="hwQty"></span><span data-i18n="hwPriceMonth"></span></div>' +
+        hwRow("kasse", "hwKasse", 1, 1014) +
+        hwRow("adyenTerminal", "hwAdyenTerminal", 1, 349) +
+        hwRow("adyenPos", "hwAdyenPos", 0, 876) +
       '</div>' +
       '<div class="box" style="margin-top:20px">' +
         '<div class="box-title" data-i18n="bfyTransBoxTitle"></div>' +
@@ -309,9 +309,7 @@
       '<div class="two-col">' +
         '<div class="box">' +
           field("bk_snittbord", "grwBkSnittbord", 850, { unit:"kr", slider:{min:0,max:5000,step:50} }) +
-          field("bk_antall", "grwBkAntall", 400, { slider:{min:0,max:2000,step:10} }) +
-          field("bk_noShowFor", "grwBkNoShowFor", 12, { unit:"%", step:0.1, slider:{min:0,max:100,step:0.5} }) +
-          field("bk_noShowEtter", "grwBkNoShowEtter", 4, { unit:"%", step:0.1, slider:{min:0,max:100,step:0.5} }) +
+          field("bk_ekstraBookinger", "grwBkEkstraBookinger", 40, { slider:{min:0,max:500,step:5} }) +
           field("bk_modulkost", "grwBkModulkost", 900, { unit:"kr", slider:{min:0,max:3000,step:10} }) +
         '</div>' +
         '<div class="box">' +
@@ -332,7 +330,12 @@
           field("ws_ekstraOms", "grwWsEkstraOms", 60000, { unit:"kr", slider:{min:0,max:500000,step:1000} }) +
           field("ws_margin", "grwWsMargin", 65, { unit:"%", slider:{min:0,max:100,step:1} }) +
           field("ws_drift", "grwWsDrift", 2500, { unit:"kr", slider:{min:0,max:50000,step:500} }) +
-          field("ws_trans", "grwWsTrans", 1.75, { unit:"%", step:0.01, slider:{min:0,max:5,step:0.01} }) +
+          field("ws_trans", "grwWsTrans", 0.55, { unit:"%", step:0.01 }) +
+          '<div class="preset-row" id="tierPresetsWs" style="padding:4px 0 8px">' +
+            '<button type="button" class="preset-btn active" data-value="0.55">IC++ 0.55%</button>' +
+            '<button type="button" class="preset-btn" data-value="0.60">Tier 8 0.60%</button>' +
+            '<button type="button" class="preset-btn" data-value="0.70">Tier 1 0.70%</button>' +
+          '</div>' +
           field("ws_modulkost", "grwWsModulkost", 1385, { unit:"kr", slider:{min:0,max:3000,step:10} }) +
         '</div>' +
         '<div class="box">' +
@@ -481,8 +484,8 @@
   }
 
   function renderBooking(){
-    var reddetMnd = num("bk_snittbord") * num("bk_antall") * ((num("bk_noShowFor") - num("bk_noShowEtter"))/100);
-    var revenueIncrease = reddetMnd * 12;
+    var ekstraMnd = num("bk_snittbord") * num("bk_ekstraBookinger");
+    var revenueIncrease = ekstraMnd * 12;
     var modulkost = num("bk_modulkost");
     var totalCost = modulkost * 12;
     var net = revenueIncrease - totalCost;
@@ -597,13 +600,17 @@
     el.addEventListener("change", handler);
   });
 
-  document.querySelectorAll("#tierPresets .preset-btn").forEach(function(b){
-    b.addEventListener("click", function(){
-      document.getElementById("t_munuProsent").value = b.dataset.value;
-      document.querySelectorAll("#tierPresets .preset-btn").forEach(function(x){ x.classList.toggle("active", x === b); });
-      syncModule("trans");
+  function wireTierPresets(rowId, targetFieldId, mod){
+    document.querySelectorAll("#" + rowId + " .preset-btn").forEach(function(b){
+      b.addEventListener("click", function(){
+        document.getElementById(targetFieldId).value = b.dataset.value;
+        document.querySelectorAll("#" + rowId + " .preset-btn").forEach(function(x){ x.classList.toggle("active", x === b); });
+        syncModule(mod);
+      });
     });
-  });
+  }
+  wireTierPresets("tierPresets", "t_munuProsent", "trans");
+  wireTierPresets("tierPresetsWs", "ws_trans", "webshop");
 
   var mpSlider = document.getElementById("mp_growthSlider");
   var mpCustom = document.getElementById("mp_growthCustom");

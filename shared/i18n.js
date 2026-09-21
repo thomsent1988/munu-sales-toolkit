@@ -68,8 +68,8 @@
       grwResPerMnd:"Ekstra per måned", grwResPerAr:"Ekstra per år",
       grwResVekstProsent:"Vekst av omsetning i helgedager",
 
-      grwBkSnittbord:"Snitt bordverdi", grwBkAntall:"Bookinger per måned",
-      grwBkNoShowFor:"No-show-rate i dag", grwBkNoShowEtter:"No-show-rate med Munu",
+      grwBkSnittbord:"Snitt bordverdi",
+      grwBkEkstraBookinger:"Ekstra bookinger per måned via web-booking",
       grwBkModulkost:"Booking, kostnad per måned",
 
       grwWsEkstraOms:"Ekstra omsetning per måned", grwWsMargin:"Bruttomargin",
@@ -150,8 +150,8 @@
       grwResPerMnd:"Extra per month", grwResPerAr:"Extra per year",
       grwResVekstProsent:"Growth of weekend-day revenue",
 
-      grwBkSnittbord:"Average table value", grwBkAntall:"Bookings per month",
-      grwBkNoShowFor:"No-show rate today", grwBkNoShowEtter:"No-show rate with Munu",
+      grwBkSnittbord:"Average table value",
+      grwBkEkstraBookinger:"Extra bookings per month via web booking",
       grwBkModulkost:"Booking, cost per month",
 
       grwWsEkstraOms:"Extra revenue per month", grwWsMargin:"Gross margin",
