@@ -64,6 +64,9 @@
   .hw-row input.hw-qty{ width:44px; text-align:center; }
   .hw-row input.hw-price{ width:76px; text-align:right; }
   .hw-row .unit{ font-size:.72rem; color:var(--grey3); }
+  .hw-remove{ width:20px; height:20px; flex:0 0 auto; border-radius:50%; border:none; background:rgba(207,33,65,.15); color:var(--red); cursor:pointer; font-size:.9rem; line-height:1; padding:0; }
+  .hw-add-row{ padding-top:8px; }
+  .hw-add-row select{ width:100%; background:rgba(214,243,255,.06); border:1px dashed rgba(214,243,255,.35); color:var(--mist); font-family:'Inter SemiBold'; font-size:.82rem; padding:8px 10px; border-radius:var(--r-sm); cursor:pointer; }
 </style>
 </head>
 <body>
@@ -175,10 +178,11 @@
     }
     return html;
   }
-  function hwRow(id, labelKey, qty, price){
-    return '<div class="hw-row"><label data-i18n="'+labelKey+'"></label>'+
+  function hwRow(id, labelKey, qty, price, removable){
+    return '<div class="hw-row" data-hw-id="'+id+'"><label data-i18n="'+labelKey+'"></label>'+
       '<input type="number" class="hw-qty" id="hw_'+id+'_qty" value="'+qty+'">'+
       '<input type="number" class="hw-price" id="hw_'+id+'_price" value="'+price+'"><span class="unit">kr</span>'+
+      (removable ? '<button type="button" class="hw-remove" data-remove="'+id+'">&times;</button>' : '')+
       '</div>';
   }
   function includeRow(mod){
@@ -237,9 +241,19 @@
       '<div class="box" style="margin-top:20px">' +
         '<div class="box-title" data-i18n="hwSectionHead"></div>' +
         '<div class="hw-head"><span data-i18n="hwQty"></span><span data-i18n="hwPriceMonth"></span></div>' +
-        hwRow("kasse", "hwKasse", 1, 1014) +
-        hwRow("adyenTerminal", "hwAdyenTerminal", 1, 349) +
-        hwRow("adyenPos", "hwAdyenPos", 0, 876) +
+        '<div id="hwRows">' +
+          hwRow("kasse", "hwKasse", 1, 1014) +
+          hwRow("adyenTerminal", "hwAdyenTerminal", 1, 349) +
+          hwRow("adyenPos", "hwAdyenPos", 0, 876) +
+        '</div>' +
+        '<div class="hw-add-row">' +
+          '<select id="hwAddLineSelect">' +
+            '<option value="" data-i18n="hwAddLine"></option>' +
+            '<option value="regnskap" data-i18n="grwModRegnskap"></option>' +
+            '<option value="booking" data-i18n="grwModBooking"></option>' +
+            '<option value="webshop" data-i18n="grwModWebshop"></option>' +
+          '</select>' +
+        '</div>' +
       '</div>' +
       '<div class="box" style="margin-top:20px">' +
         '<div class="box-title" data-i18n="bfyTransBoxTitle"></div>' +
@@ -611,6 +625,45 @@
   }
   wireTierPresets("tierPresets", "t_munuProsent", "trans");
   wireTierPresets("tierPresetsWs", "ws_trans", "webshop");
+
+  var EXTRA_HW_LINES = {
+    regnskap: { labelKey:"grwModRegnskap", price:349 },
+    booking: { labelKey:"grwModBooking", price:500 },
+    webshop: { labelKey:"grwModWebshop", price:1385 }
+  };
+
+  function addHwLine(key){
+    if(HW_ITEMS.indexOf(key) !== -1) return;
+    var meta = EXTRA_HW_LINES[key];
+    var wrap = document.createElement("div");
+    wrap.innerHTML = hwRow(key, meta.labelKey, 1, meta.price, true);
+    var rowEl = wrap.firstElementChild;
+    document.getElementById("hwRows").appendChild(rowEl);
+    HW_ITEMS.push(key);
+
+    rowEl.querySelectorAll("input").forEach(function(el){
+      el.addEventListener("input", function(){ syncModule("trans"); });
+    });
+    rowEl.querySelector(".hw-remove").addEventListener("click", function(){
+      rowEl.remove();
+      HW_ITEMS.splice(HW_ITEMS.indexOf(key), 1);
+      var opt = document.querySelector('#hwAddLineSelect option[value="'+key+'"]');
+      if(opt) opt.hidden = false;
+      syncModule("trans");
+    });
+
+    var opt2 = document.querySelector('#hwAddLineSelect option[value="'+key+'"]');
+    if(opt2) opt2.hidden = true;
+
+    window.MunuI18n.applyLang(window.MunuI18n.getLang());
+    syncModule("trans");
+  }
+
+  document.getElementById("hwAddLineSelect").addEventListener("change", function(e){
+    var v = e.target.value;
+    e.target.value = "";
+    if(v){ addHwLine(v); }
+  });
 
   var mpSlider = document.getElementById("mp_growthSlider");
   var mpCustom = document.getElementById("mp_growthCustom");

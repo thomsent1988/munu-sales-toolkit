@@ -37,9 +37,9 @@
       bfySetupTotal:"Engangskostnad oppsett",
       bfySnittPris:"Snitt pris per transaksjon",
 
-      hwSectionHead:"Munu maskinvare",
+      hwSectionHead:"Munu faste kostnader",
       hwKasse:"Kasse", hwAdyenTerminal:"Adyen bankterminal", hwAdyenPos:"Adyen med POS",
-      hwQty:"Antall", hwPriceMonth:"Pris per måned",
+      hwQty:"Antall", hwPriceMonth:"Pris per måned", hwAddLine:"+ Legg til linje",
 
       breakevenRevenue:"Breakeven omsetning",
       breakevenRevenueYear:"Breakeven ekstra omsetning per år",
@@ -119,9 +119,9 @@
       bfySetupTotal:"One-time setup cost",
       bfySnittPris:"Average price per transaction",
 
-      hwSectionHead:"Munu hardware",
+      hwSectionHead:"Munu fixed costs",
       hwKasse:"POS", hwAdyenTerminal:"Adyen card terminal", hwAdyenPos:"Adyen with POS",
-      hwQty:"Quantity", hwPriceMonth:"Price per month",
+      hwQty:"Quantity", hwPriceMonth:"Price per month", hwAddLine:"+ Add line",
 
       breakevenRevenue:"Breakeven revenue",
       breakevenRevenueYear:"Breakeven extra revenue per year",
