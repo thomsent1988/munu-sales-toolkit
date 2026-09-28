@@ -618,11 +618,26 @@
     el.addEventListener("change", handler);
   });
 
+  var BASE_HW_PRICES = { kasse:1014, adyenTerminal:349, adyenPos:876, regnskap:349, booking:500, webshop:1385 };
+  var ic01Active = false;
+
+  function restoreNormalHwPricing(){
+    HW_ITEMS.forEach(function(key){
+      var priceEl = document.getElementById("hw_" + key + "_price");
+      if(priceEl && BASE_HW_PRICES[key] !== undefined) priceEl.value = String(BASE_HW_PRICES[key]);
+    });
+    document.getElementById("t_munuBehandling").value = "0.40";
+  }
+
   function wireTierPresets(rowId, targetFieldId, mod){
     document.querySelectorAll("#" + rowId + " .preset-btn").forEach(function(b){
       b.addEventListener("click", function(){
         document.getElementById(targetFieldId).value = b.dataset.value;
         document.querySelectorAll("#" + rowId + " .preset-btn").forEach(function(x){ x.classList.toggle("active", x === b); });
+        if(rowId === "tierPresets" && b.dataset.special !== "ic01" && ic01Active){
+          restoreNormalHwPricing();
+          ic01Active = false;
+        }
         syncModule(mod);
       });
     });
@@ -633,6 +648,7 @@
   var ic01Btn = document.querySelector('#tierPresets .preset-btn[data-special="ic01"]');
   if(ic01Btn){
     ic01Btn.addEventListener("click", function(){
+      ic01Active = true;
       document.getElementById("t_munuBehandling").value = "0.40";
       HW_ITEMS.slice().forEach(function(key){
         var priceEl = document.getElementById("hw_" + key + "_price");
