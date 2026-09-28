@@ -388,14 +388,13 @@
     <line x1="32" y1="8" x2="32" y2="14"/>
     <path d="M17 29 L22 34 L32 24"/>
   </symbol>
-  <symbol id="icon-kunderegister" viewBox="0 0 48 48">
-    <circle cx="18" cy="16" r="6"/>
-    <path d="M8 38 Q8 26 18 26 Q28 26 28 38"/>
-    <circle cx="33" cy="19" r="5"/>
-    <path d="M26 38 Q26 29 33 29 Q40 29 40 38"/>
-  </symbol>
-  <symbol id="icon-bonusprogram" viewBox="0 0 48 48">
-    <path d="M24 8 L28.5 19 L40 19.5 L30.8 26.7 L34 38 L24 31.2 L14 38 L17.2 26.7 L8 19.5 L19.5 19 Z"/>
+  <symbol id="icon-bankterminal" viewBox="0 0 48 48">
+    <rect x="13" y="6" width="22" height="36" rx="4"/>
+    <rect x="17" y="12" width="14" height="10" rx="1"/>
+    <line x1="17" y1="27" x2="21" y2="27"/>
+    <line x1="24" y1="27" x2="28" y2="27"/>
+    <line x1="17" y1="33" x2="21" y2="33"/>
+    <line x1="24" y1="33" x2="28" y2="33"/>
   </symbol>
   <symbol id="icon-analytics" viewBox="0 0 48 48">
     <line x1="8" y1="40" x2="40" y2="40"/>
@@ -529,49 +528,29 @@
         proof:{value:"−30%", label:"fewer no-shows reported by Munu Booking customers"},
         cta:"Book a demo of table booking" } },
 
-    { id:"kunderegister", icon:"icon-kunderegister", hero:"flow",
-      no:{ short:"Kunderegister", cat:"Relasjon",
-        tag:"Ett kunderegister for hele virksomheten",
-        sub:"Registrer en gjest én gang — samme data følger med i kasse, nettbutikk, booking og fakturering.",
-        features:["Skiller lojalitetskunder fra bedriftskunder med egne fakturaavtaler",
-          "Kundegrupper med egne prisregler, som personalpris, satt opp én gang",
-          "Rask søk på navn, telefon, e-post eller organisasjonsnummer",
-          "Full historikk og notater samlet på hver kunde",
-          "GDPR-tilpasset — fra inaktivering til fullstendig sletting"],
-        who:"For virksomheter som er lei av å ha kundedata spredt over flere systemer.",
-        cta:"Book en demo av kunderegisteret" },
-      en:{ short:"CRM", cat:"Relationships",
-        tag:"One customer register for the whole business",
-        sub:"Register a guest once — the same data follows through till, webshop, booking and invoicing.",
-        features:["Separates loyalty customers from corporate accounts with their own invoicing terms",
-          "Customer groups carry their own price rules, like staff pricing, set up once",
-          "Fast search by name, phone, email or organisation number",
-          "Full history and notes gathered on every customer",
-          "GDPR-aware, from deactivation through to full erasure"],
-        who:"Built for businesses tired of customer data scattered across several systems.",
-        cta:"Book a demo of the customer register" } },
-
-    { id:"bonusprogram", icon:"icon-bonusprogram", hero:"gauge",
-      no:{ short:"Bonusprogram", cat:"Lojalitet",
-        tag:"Bygg lojalitet som varer, ikke bare et poeng i systemet",
-        sub:"Poeng, stempelkort og gavekort som gir gjestene en grunn til å komme tilbake.",
-        features:["Poeng- eller stempelkortbaserte fordeler for faste gjester",
-          "Digitale og fysiske gavekort, gyldige i kasse, nettbutikk og kiosk",
-          "Kundegrupper med egne rabattregler, satt opp fra kunderegisteret",
-          "Automatisk registrering og oppfølging basert på kjøpshistorikk"],
-        who:"For restauranter og kjeder som vil øke gjenkjøp og gjøre stamgjester enda mer lojale.",
-        note:"Driver blant annet det poengbaserte lojalitetsprogrammet til Starbucks, via Dely.",
-        cta:"Book en demo av bonusprogrammet" },
-      en:{ short:"Loyalty", cat:"Loyalty",
-        tag:"Build loyalty that lasts, not just a point in the system",
-        sub:"Points, stamp cards and gift cards that give guests a reason to come back.",
-        features:["Points- or stamp-card-based rewards for regular guests",
-          "Digital and physical gift cards, valid across till, webshop and kiosk",
-          "Customer groups with their own discount rules, set up from the customer register",
-          "Automatic enrolment and follow-up based on purchase history"],
-        who:"Built for restaurants and chains who want more repeat visits and more loyal regulars.",
-        note:"Powers the points-based loyalty programme for Starbucks, via Dely.",
-        cta:"Book a demo of the loyalty programme" } },
+    { id:"bankterminaler", icon:"icon-bankterminal", hero:"pulse",
+      no:{ short:"Bankterminaler", cat:"Betaling",
+        tag:"Adyen-bankterminaler, tilpasset hvordan du jobber",
+        sub:"Fra kablet basisterminal til trådløs alt-i-ett — betaling som følger gjesten, ikke omvendt.",
+        features:["Adyen P630 kablet terminal for fast kasseplass",
+          "Adyen S1F2 trådløs terminal på Wi-Fi eller 4G, følger deg i lokalet",
+          "Munu Go alt-i-ett — kasse og betaling i én håndholdt enhet",
+          "Tips, delt betaling og retur håndteres direkte på terminalen",
+          "Full avstemming mot kassen, ned til hver eneste transaksjon"],
+        who:"For alt fra fast disk-salg til servering ved bordet og pop-up-arrangementer.",
+        proof:{value:"4", label:"terminalmodeller å velge mellom, fra kablet til alt-i-ett"},
+        cta:"Book en demo av bankterminalene" },
+      en:{ short:"Bank terminals", cat:"Payment",
+        tag:"Adyen card terminals, fitted to how you work",
+        sub:"From a wired basic terminal to a wireless all-in-one — payment that follows the guest, not the other way round.",
+        features:["Adyen P630 wired terminal for a fixed till position",
+          "Adyen S1F2 wireless terminal on Wi-Fi or 4G, moves with you through the venue",
+          "Munu Go all-in-one — till and payment in a single handheld device",
+          "Tips, split payments and refunds handled directly on the terminal",
+          "Full reconciliation against the till, down to every single transaction"],
+        who:"Built for everything from a fixed counter to tableside service and pop-up events.",
+        proof:{value:"4", label:"terminal models to choose from, from wired to all-in-one"},
+        cta:"Book a demo of the bank terminals" } },
 
     { id:"analytics", icon:"icon-analytics", hero:"ticker",
       no:{ short:"Analytics", cat:"Innsikt",
